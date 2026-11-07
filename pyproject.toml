@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bmi3-dti"
+version = "0.1.0"
+description = "BMI3 Group 10: reproducible hidden-edge recovery benchmark scaffold"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24,<3"]
+
+[project.scripts]
+bmi3-dti = "bmi3_dti.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

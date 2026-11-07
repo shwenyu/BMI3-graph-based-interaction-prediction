@@ -1,0 +1,8 @@
+{
+  "datasets": ["e", "ic", "gpcr", "nr"],
+  "modes": ["random"],
+  "fractions": [0.1, 0.2, 0.3],
+  "seeds": [0, 1, 2, 3, 4],
+  "methods": ["random", "target-degree"],
+  "top_n": 10
+}

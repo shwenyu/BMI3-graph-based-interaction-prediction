@@ -1,0 +1,130 @@
+[
+  {
+    "file": "e_admat_dgc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/e_admat_dgc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/e_admat_dgc.txt",
+    "bytes": 599428,
+    "sha256": "bf73f8f0c1a71f9fe92d1e0d8a1065a1122b383532cd47fc73df1cb0d9ba6c10",
+    "retrieved_utc": "2026-11-07T07:47:52.572535+00:00"
+  },
+  {
+    "file": "e_simmat_dc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/e_simmat_dc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/e_simmat_dc.txt",
+    "bytes": 1624549,
+    "sha256": "28105b9570c91b4eac688eaf92db2e4aacb7117bc8665cab527fc5d45cd83606",
+    "retrieved_utc": "2026-11-07T07:47:48.785448+00:00"
+  },
+  {
+    "file": "e_simmat_dg.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/e_simmat_dg.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/e_simmat_dg.txt",
+    "bytes": 8342867,
+    "sha256": "14816c2bba2193d62f52ab53bd51fe9a490b28e98cf33df392a5da2bf24e5607",
+    "retrieved_utc": "2026-11-07T07:47:49.452432+00:00"
+  },
+  {
+    "file": "bind_orfhsa_drug_e.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_e.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_e.txt",
+    "bytes": 46907,
+    "sha256": "54287ef4cde5713126187f6a399eccbcfebe4c2aa227b5ff4610a3baeb572e28",
+    "retrieved_utc": "2026-11-07T07:47:48.267285+00:00"
+  },
+  {
+    "file": "ic_admat_dgc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/ic_admat_dgc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/ic_admat_dgc.txt",
+    "bytes": 88816,
+    "sha256": "ac9df3498bc12af5174503e5f1e09ce26a6d78d753861a5eca55425f9f9ae2c9",
+    "retrieved_utc": "2026-11-07T07:47:49.424042+00:00"
+  },
+  {
+    "file": "ic_simmat_dc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/ic_simmat_dc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/ic_simmat_dc.txt",
+    "bytes": 365986,
+    "sha256": "c1078ca88528d75ddb43d4ed2559391d7d8f5375ec572e6e9112e519d9cdbbf9",
+    "retrieved_utc": "2026-11-07T07:47:49.698511+00:00"
+  },
+  {
+    "file": "ic_simmat_dg.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/ic_simmat_dg.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/ic_simmat_dg.txt",
+    "bytes": 790045,
+    "sha256": "e15626145623124ad42a45412c544d5fed5e079003727df784d29ed3ca72efef",
+    "retrieved_utc": "2026-11-07T07:47:50.428211+00:00"
+  },
+  {
+    "file": "bind_orfhsa_drug_ic.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_ic.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_ic.txt",
+    "bytes": 23676,
+    "sha256": "31166929b5b0837acc1f2553061365731192fc39c1e2916ea8d84874fac96bf4",
+    "retrieved_utc": "2026-11-07T07:47:49.951406+00:00"
+  },
+  {
+    "file": "gpcr_admat_dgc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/gpcr_admat_dgc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/gpcr_admat_dgc.txt",
+    "bytes": 44686,
+    "sha256": "49b2a8a0139dac3116399618bfefc9d1afcc276ce31b7de4e241d1b6e62ef8ab",
+    "retrieved_utc": "2026-11-07T07:47:50.483471+00:00"
+  },
+  {
+    "file": "gpcr_simmat_dc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/gpcr_simmat_dc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/gpcr_simmat_dc.txt",
+    "bytes": 417709,
+    "sha256": "ba9c1cf096f0f688d1341fec22ebdecb63162005394d3b5ec3e2f2ef3fd40df9",
+    "retrieved_utc": "2026-11-07T07:47:50.888669+00:00"
+  },
+  {
+    "file": "gpcr_simmat_dg.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/gpcr_simmat_dg.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/gpcr_simmat_dg.txt",
+    "bytes": 167125,
+    "sha256": "c58c4311d2086a6914208ed0914598528ce54ade88eb52b0f737eedcaf5001e4",
+    "retrieved_utc": "2026-11-07T07:47:51.287722+00:00"
+  },
+  {
+    "file": "bind_orfhsa_drug_gpcr.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_gpcr.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_gpcr.txt",
+    "bytes": 9932,
+    "sha256": "b2e8eab957d9fd82bcfe1df8cbbcdf743c3a8805138de450bea482962aca80fa",
+    "retrieved_utc": "2026-11-07T07:47:50.972556+00:00"
+  },
+  {
+    "file": "nr_admat_dgc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/nr_admat_dgc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/nr_admat_dgc.txt",
+    "bytes": 3393,
+    "sha256": "74256ec88b415dbdb93735e93797955e82587f3154988e99787a4e604111963b",
+    "retrieved_utc": "2026-11-07T07:47:51.415123+00:00"
+  },
+  {
+    "file": "nr_simmat_dc.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/nr_simmat_dc.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/nr_simmat_dc.txt",
+    "bytes": 24957,
+    "sha256": "f80e101f284934b85c5dc7601ecaca2cc86c62a946141b2587f3ac8482c9a7c1",
+    "retrieved_utc": "2026-11-07T07:47:51.807077+00:00"
+  },
+  {
+    "file": "nr_simmat_dg.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/nr_simmat_dg.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/nr_simmat_dg.txt",
+    "bytes": 12303,
+    "sha256": "5bf651f310b037320fe5d8aa61dfa15e0d8af4b0fd50c3969201085e64b631e1",
+    "retrieved_utc": "2026-11-07T07:47:51.889531+00:00"
+  },
+  {
+    "file": "bind_orfhsa_drug_nr.txt",
+    "url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_nr.txt",
+    "resolved_url": "http://web.kuicr.kyoto-u.ac.jp/supp/yoshi/drugtarget/bind_orfhsa_drug_nr.txt",
+    "bytes": 1431,
+    "sha256": "22780b068eb828fe17f447a8ebb71b5ab3c3d0ef3f115163e584575e926d99df",
+    "retrieved_utc": "2026-11-07T07:47:51.899358+00:00"
+  }
+]

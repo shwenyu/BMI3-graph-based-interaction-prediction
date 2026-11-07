@@ -1,0 +1,138 @@
+<html>
+
+<head>
+  <title>Supplements</title>
+</head>
+
+<BODY BGCOLOR="#E1FCFF" TEXT="#000055" LINK="#005522" ALINK="#005522" VLINK="#005522">
+
+<font color="#004080">
+
+<center>
+  <H2>Supplements of ISMB 2008 paper: </H2>
+</center>
+
+
+<ul>
+
+  <H3>
+      Yamanishi,Y., Araki,M., Gutteridge,A., Honda,W. and Kanehisa,M. <BR>
+      Prediction of drug-target interaction networks from the integration of chemical and genomic spaces
+  </H3>
+
+<BR>
+
+
+<H3>
+Predicted drug-target interaction networks<BR>
+</H3>
+
+  <OL>
+  <LI>All newly predicted compound-protein interacion pairs with annotation information (text file) <BR>
+    <UL>
+      <LI><A HREF="e_predpairmat_definition_expdist.txt">Enzyme</A>
+      <LI><A HREF="ic_predpairmat_definition_expdist.txt">Ion channel</A>
+      <LI><A HREF="gpcr_predpairmat_definition_expdist.txt">GPCR</A>
+      <LI><A HREF="nr_predpairmat_definition_expdist.txt">Nuclear receptor</A>
+    </UL>
+  <BR>
+Note that the top scoring predicted drug-target interaction pairs with the upper one percent score percentile are shown. <BR>
+
+The 1st column and the 2nd column indicate the protein and the compound in the predicted interaction pair, respectively. <BR>
+
+The 3rd column indicates the candidate score in the prediction. <BR>
+
+The 4th column and the 5th column indicate the protein and the compound in the mimicked interaction pairs. <BR>
+
+The mimicked interaction pair means a known drug-target interaction pair (in the gold standard data) which is the closest to the predicted drug-target interaction pair in the pharmacological feature space. <BR>
+
+  <BR>
+
+  <LI>High resolution graph pictures of the predicted networks (pdf file) <BR>
+    <UL>
+      <LI><A HREF="e_graph_predgold.pdf">Enzyme</A>
+      <LI><A HREF="ic_graph_predgold.pdf">Ion channel</A>
+      <LI><A HREF="gpcr_graph_predgold.pdf">GPCR</A>
+      <LI><A HREF="nr_graph_predgold.pdf">Nuclear receptor</A>
+    </UL>
+  <BR>
+
+Note that a threshold is chosen such that the number of predicted interaction edges is the same as the number of gold standard interaction edges in order to make it easier to see the overview of the network. <BR>
+  <BR>
+  </OL>
+
+
+<H3>
+Gold standard datasets used in this study
+</H3>
+
+  <OL>
+  <LI>Binary relation list of the gold standard drug-target interaction data (text file) <BR>
+    <UL>
+      <LI><A HREF="bind_orfhsa_drug_e.txt">Enzyme</A>
+      <LI><A HREF="bind_orfhsa_drug_ic.txt">Ion channel</A>
+      <LI><A HREF="bind_orfhsa_drug_gpcr.txt">GPCR</A>
+      <LI><A HREF="bind_orfhsa_drug_nr.txt">Nuclear receptor</A>
+    </UL>
+  <BR>
+ Note that the interaction information is obtained from KEGG BRITE, BRENDA, SuperTarget, and DrugBank. (Nov 2007)<BR>
+
+ The data in the databases are being updated day by day, but the dataset here will not be updated.<BR>
+
+ We suggest to see the latest version stored in the databases.<BR>
+
+  <BR>
+
+  <LI>Adjacency matrix of the gold standard drug-target interaction data (text file) <BR>
+    <UL>
+      <LI><A HREF="e_admat_dgc.txt">Enzyme</A>
+      <LI><A HREF="ic_admat_dgc.txt">Ion channel</A>
+      <LI><A HREF="gpcr_admat_dgc.txt">GPCR</A>
+	 <LI><A HREF="nr_admat_dgc.txt">Nuclear receptor</A>
+    </UL>
+  <BR>
+ Note that this is an adjacency matrix representation of the above gold standard data.<BR>
+
+  <BR>
+
+  <LI>Compound structure similarity matrix (text file) <BR>
+    <UL>
+      <LI><A HREF="e_simmat_dc.txt">Enzyme</A>
+      <LI><A HREF="ic_simmat_dc.txt">Ion channel</A>
+      <LI><A HREF="gpcr_simmat_dc.txt">GPCR</A>
+      <LI><A HREF="nr_simmat_dc.txt">Nuclear receptor</A>
+    </UL>
+  <BR>
+ Note that the similarity scores are computed by the SIMCOMP score (Hattori et al, J.Ame.Chem.Soc, 2003)<BR>
+
+  <BR>
+
+  <LI>Protein sequence similarity matrix (text file) <BR>
+    <UL>
+      <LI><A HREF="e_simmat_dg.txt">Enzyme</A>
+	    <LI><A HREF="ic_simmat_dg.txt">Ion channel</A>
+      <LI><A HREF="gpcr_simmat_dg.txt">GPCR</A>
+	 <LI><A HREF="nr_simmat_dg.txt">Nuclear receptor</A>
+    </UL>
+  <BR>
+ Note that the similarity scores are computed by the normalized SmithWaterman score (Smith and Waterman, J.Mol.Bio, 1981)<BR>
+
+  <BR>
+  <BR>
+
+  </OL>
+
+
+
+<HR>
+<BR>
+
+
+
+
+
+</UL>
+
+
+</BODY>
+</HTML>

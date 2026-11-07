@@ -1,0 +1,94 @@
+[
+  {
+    "dataset": "e",
+    "drugs": 445,
+    "proteins": 664,
+    "edges": 2926,
+    "density": 0.009902531474211452,
+    "source_orientation": "protein_rows; transposed",
+    "similarities": {
+      "drug": {
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "max_asymmetry": 0.091667,
+        "nonunit_diagonal": 17
+      },
+      "protein": {
+        "minimum": 0.00397573887441264,
+        "maximum": 1.0,
+        "max_asymmetry": 0.0,
+        "nonunit_diagonal": 0
+      }
+    },
+    "edge_list_crosscheck": "passed"
+  },
+  {
+    "dataset": "ic",
+    "drugs": 210,
+    "proteins": 204,
+    "edges": 1476,
+    "density": 0.034453781512605045,
+    "source_orientation": "protein_rows; transposed",
+    "similarities": {
+      "drug": {
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "max_asymmetry": 0.164871,
+        "nonunit_diagonal": 5
+      },
+      "protein": {
+        "minimum": 0.00231565935342984,
+        "maximum": 1.0,
+        "max_asymmetry": 0.0,
+        "nonunit_diagonal": 0
+      }
+    },
+    "edge_list_crosscheck": "passed"
+  },
+  {
+    "dataset": "gpcr",
+    "drugs": 223,
+    "proteins": 95,
+    "edges": 635,
+    "density": 0.029974038234599952,
+    "source_orientation": "protein_rows; transposed",
+    "similarities": {
+      "drug": {
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "max_asymmetry": 0.18518500000000004,
+        "nonunit_diagonal": 7
+      },
+      "protein": {
+        "minimum": 0.00892998678417585,
+        "maximum": 1.0,
+        "max_asymmetry": 0.0,
+        "nonunit_diagonal": 0
+      }
+    },
+    "edge_list_crosscheck": "passed"
+  },
+  {
+    "dataset": "nr",
+    "drugs": 54,
+    "proteins": 26,
+    "edges": 90,
+    "density": 0.0641025641025641,
+    "source_orientation": "protein_rows; transposed",
+    "similarities": {
+      "drug": {
+        "minimum": 0.013158,
+        "maximum": 1.0,
+        "max_asymmetry": 0.07500000000000001,
+        "nonunit_diagonal": 0
+      },
+      "protein": {
+        "minimum": 0.0179332965382288,
+        "maximum": 1.0,
+        "max_asymmetry": 0.0,
+        "nonunit_diagonal": 0
+      }
+    },
+    "edge_list_crosscheck": "passed"
+  }
+]
