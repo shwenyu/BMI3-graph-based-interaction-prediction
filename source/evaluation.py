@@ -9,20 +9,35 @@ def ranking_metrics(labels, scores):
     if not np.isfinite(scores).all():
         raise ValueError("Nonfinite prediction scores")
     order = np.argsort(-scores, kind="stable")
-    y, s = labels[order], scores[order]
-    ends = np.r_[np.flatnonzero(s[:-1] != s[1:]), len(s) - 1]
-    tp = np.cumsum(y)[ends].astype(float)
-    fp = (ends + 1) - tp
+    sorted_labels = labels[order]
+    sorted_scores = scores[order]
+    # Evaluate only after including every candidate with the same score.
+    score_changes = np.flatnonzero(sorted_scores[:-1] != sorted_scores[1:])
+    group_ends = np.append(score_changes, len(sorted_scores) - 1)
+    predicted_count = group_ends + 1
+    true_positives = np.cumsum(sorted_labels)[group_ends].astype(float)
+    false_positives = predicted_count - true_positives
     positives, negatives = int(labels.sum()), int((~labels).sum())
-    precision = tp / (ends + 1)
-    recall = tp / positives if positives else np.zeros_like(tp)
-    # AP groups all equal scores at one threshold; never breaks ties using labels.
-    ap = float(np.sum(np.diff(np.r_[0, recall]) * precision)) if positives else None
-    fpr = fp / negatives if negatives else np.zeros_like(fp)
-    auc = (float(np.sum(np.diff(np.r_[0, fpr]) *
-           (np.r_[0, recall][:-1] + recall) / 2)) if positives and negatives else None)
+    precision = true_positives / predicted_count
+    recall = np.zeros_like(true_positives)
+    ap = None
+    if positives:
+        recall = true_positives / positives
+        recall_gains = np.diff(np.insert(recall, 0, 0))
+        ap = float(np.sum(recall_gains * precision))
+
+    fpr = np.zeros_like(false_positives)
+    auc = None
+    if negatives:
+        fpr = false_positives / negatives
+    if positives and negatives:
+        # Each trapezoid has width delta FPR and height average recall.
+        widths = np.diff(np.insert(fpr, 0, 0))
+        previous_recall = np.insert(recall[:-1], 0, 0)
+        auc = float(np.sum(widths * (previous_recall + recall) / 2))
+
     return dict(ap=ap, auroc=auc, positives=positives, background=negatives,
-                precision=precision, recall=recall, fpr=fpr, thresholds=s[ends])
+                precision=precision, recall=recall, fpr=fpr, thresholds=sorted_scores[group_ends])
 
 
 def evaluate(scores, hidden, candidates, proteins, top_n=10):
@@ -36,13 +51,13 @@ def evaluate(scores, hidden, candidates, proteins, top_n=10):
     curves = {k: pooled.pop(k) for k in ("precision", "recall", "fpr", "thresholds")}
     rows = []
     for i in range(scores.shape[0]):
-        js = np.flatnonzero(candidates[i])
+        candidate_targets = np.flatnonzero(candidates[i])
         # Deterministic identifier tie break for top-N only; independent of labels.
-        ranked = sorted(js, key=lambda j: (-float(scores[i, j]), proteins[j]))
+        ranked = sorted(candidate_targets, key=lambda j: (-float(scores[i, j]), proteins[j]))
         top = ranked[:top_n]
         positives = int(hidden[i].sum())
         hits = int(hidden[i, top].sum())
-        rows.append(dict(drug_index=i, candidates=len(js), hidden=positives,
+        rows.append(dict(drug_index=i, candidates=len(candidate_targets), hidden=positives,
                          hits=hits, precision=hits / len(top) if top else None,
                          recall=hits / positives if positives else None))
     eligible = [row for row in rows if row["hidden"] > 0]

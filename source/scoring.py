@@ -4,10 +4,13 @@ import numpy as np
 
 def drug_only(visible, similarity):
     scores = np.zeros(visible.shape, dtype=float)
-    for i, weights in enumerate(similarity):
-        total = weights.sum()
-        if total > 0:
-            scores[i] = (weights[:, None] * visible).sum(axis=0) / total
+    for drug, weights in enumerate(similarity):
+        total_weight = weights.sum()
+        if total_weight > 0:
+            # Give each neighbor's row its similarity weight, then sum by target.
+            weighted_edges = weights[:, None] * visible
+            votes_by_target = weighted_edges.sum(axis=0)
+            scores[drug] = votes_by_target / total_weight
     return scores
 
 
@@ -21,7 +24,8 @@ def two_sided(drug_scores, protein_scores, alpha):
 
 
 def target_degree(visible):
-    return np.broadcast_to(visible.sum(axis=0), visible.shape)
+    targets = visible.sum(axis=0)
+    return np.broadcast_to(targets, visible.shape)
 
 
 def random_scores(shape, seed):

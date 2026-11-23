@@ -27,8 +27,11 @@ def read_matrix(path):
 def align_square(rows, columns, matrix, ids):
     if set(rows) != set(ids) or set(columns) != set(ids):
         raise ValueError("Similarity and interaction identifier sets differ")
-    ri, ci = {x: i for i, x in enumerate(rows)}, {x: i for i, x in enumerate(columns)}
-    return matrix[np.ix_([ri[x] for x in ids], [ci[x] for x in ids])]
+    row_index = {identifier: i for i, identifier in enumerate(rows)}
+    column_index = {identifier: j for j, identifier in enumerate(columns)}
+    row_order = [row_index[identifier] for identifier in ids]
+    column_order = [column_index[identifier] for identifier in ids]
+    return matrix[np.ix_(row_order, column_order)]
 
 
 @dataclass
@@ -74,10 +77,15 @@ def load_dataset(root, code):
     np.fill_diagonal(sp, 0)
     edge_path = root / f"bind_orfhsa_drug_{code}.txt"
     if edge_path.exists():
-        listed = {(protein.replace("hsa:", "hsa", 1), drug)
-                  for protein, drug in (line.split() for line in edge_path.read_text().splitlines()
-                                        if line.strip())}
-        actual = {(proteins[j], drugs[i]) for i, j in np.argwhere(a == 1)}
+        listed = set()
+        for line in edge_path.read_text().splitlines():
+            if line.strip():
+                protein, drug = line.split()
+                listed.add((protein.replace("hsa:", "hsa", 1), drug))
+
+        actual = set()
+        for i, j in np.argwhere(a == 1):
+            actual.add((proteins[j], drugs[i]))
         if listed != actual:
             raise ValueError("Source edge list disagrees with adjacency matrix")
         audit["edge_list_crosscheck"] = "passed"

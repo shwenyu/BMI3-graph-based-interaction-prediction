@@ -7,12 +7,18 @@ def split_edges(adjacency, seed):
     if len(edges) < 10:
         raise ValueError("Need at least ten known edges for the 8:1:1 split")
     shuffled = np.random.default_rng(seed).permutation(edges)
-    n = len(edges) // 10
+    held_out_count = len(edges) // 10
+    validation_edges = shuffled[:held_out_count]
+    test_edges = shuffled[held_out_count:2 * held_out_count]
+    train_edges = shuffled[2 * held_out_count:]
+
     train = np.zeros_like(adjacency)
-    validation = np.zeros_like(adjacency, dtype=bool)
-    test = np.zeros_like(validation)
-    for matrix, pairs in ((validation, shuffled[:n]), (test, shuffled[n:2*n]),
-                          (train, shuffled[2*n:])):
-        for drug, protein in pairs:
-            matrix[drug, protein] = 1
+    validation = np.zeros(adjacency.shape, dtype=bool)
+    test = np.zeros(adjacency.shape, dtype=bool)
+    for drug, protein in train_edges:
+        train[drug, protein] = 1
+    for drug, protein in validation_edges:
+        validation[drug, protein] = True
+    for drug, protein in test_edges:
+        test[drug, protein] = True
     return train, validation, test
