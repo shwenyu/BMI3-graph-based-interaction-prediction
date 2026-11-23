@@ -10,24 +10,24 @@ from matplotlib import pyplot as plt
 from matplotlib.ticker import PercentFormatter
 
 
-DATASETS = (
-    ("e", "Enzyme", "#0072B2"),
-    ("ic", "Ion channel", "#E69F00"),
-    ("gpcr", "GPCR", "#009E73"),
-    ("nr", "Nuclear receptor", "#CC79A7"),
-)
+DATASETS = {
+    "e": "Enzyme",
+    "ic": "Ion channel",
+    "gpcr": "GPCR",
+    "nr": "Nuclear receptor",
+}
 METHODS = {
-    "random": "Random",
-    "target-degree": "Target degree",
-    "drug-only": "Drug only",
-    "protein-only": "Protein only",
-    "two-sided": "Two-sided",
+    "random": ("Random", "#777777"),
+    "target-degree": ("Target degree", "#E69F00"),
+    "drug-only": ("Drug only", "#0072B2"),
+    "protein-only": ("Protein only", "#009E73"),
+    "two-sided": ("Two-sided", "#CC79A7"),
 }
 
 
 def read_results(results, seed):
     tables = {}
-    for code, _, _ in DATASETS:
+    for code in DATASETS:
         path = results / f"{code}_seed{seed}" / "test.csv"
         with path.open(newline="") as handle:
             rows = list(csv.DictReader(handle))
@@ -40,27 +40,27 @@ def read_results(results, seed):
 
 def plot_metric(tables, metric, label, output, top_n):
     fig, ax = plt.subplots(figsize=(8.3, 4.4), layout="constrained")
-    positions = range(len(METHODS))
-    width = 0.19
+    positions = range(len(DATASETS))
+    width = 0.15
     largest = 0
 
-    for index, (code, name, color) in enumerate(DATASETS):
-        offset = width * (index - (len(DATASETS) - 1) / 2)
+    for index, (method, (name, color)) in enumerate(METHODS.items()):
+        offset = width * (index - (len(METHODS) - 1) / 2)
         x = [position + offset for position in positions]
-        values = [float(tables[code][method][metric]) for method in METHODS]
+        values = [float(tables[code][method][metric]) for code in DATASETS]
         if any(not 0 <= value <= 1 for value in values):
-            raise ValueError(f"{code}: {metric} must contain scores from 0 to 1")
+            raise ValueError(f"{method}: {metric} must contain scores from 0 to 1")
         ax.bar(x, values, width=width, label=name, color=color)
         largest = max(largest, max(values))
 
-    ax.set_xticks(list(positions), list(METHODS.values()))
+    ax.set_xticks(list(positions), list(DATASETS.values()))
     ax.set_ylabel(label)
     ax.set_ylim(0, min(1, max(0.05, largest * 1.12)))
     ax.yaxis.set_major_formatter(PercentFormatter(1))
     ax.set_axisbelow(True)
     ax.grid(axis="y", color="#E4E4E4")
     ax.spines[["top", "right"]].set_visible(False)
-    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.01), ncol=4, frameon=False)
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.01), ncol=5, frameon=False)
 
     stem = metric
     if metric.startswith("macro_top_"):
