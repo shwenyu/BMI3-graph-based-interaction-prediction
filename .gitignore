@@ -1,6 +1,14 @@
 __pycache__/
 input/*
 !input/.gitkeep
+!input/*_admat_dgc.txt
+!input/*_simmat_dc.txt
+!input/*_simmat_dg.txt
+!input/bind_orfhsa_drug_*.txt
+!input/reference_predictions/
+input/reference_predictions/*
+!input/reference_predictions/*_predpairmat_definition_expdist.txt
+!input/reference_predictions/info.md
 output/*
 !output/.gitkeep
 .DS_Store
