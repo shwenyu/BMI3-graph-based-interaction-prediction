@@ -8,6 +8,7 @@ import platform
 import subprocess
 import sys
 from datetime import datetime, timezone
+from importlib.metadata import version
 from pathlib import Path
 from time import perf_counter
 
@@ -274,7 +275,8 @@ def main(argv=None):
         digest.update(path.name.encode())
         digest.update(path.read_bytes())
     receipt = dict(config=config, runs=records, git=git_state(), source_sha256=digest.hexdigest(),
-        python=sys.version, numpy=np.__version__, platform=platform.platform(),
+        python=sys.version, numpy=np.__version__,
+        matplotlib=version("matplotlib") if not args.no_plots else None, platform=platform.platform(),
         thread_environment={name: os.environ.get(name) for name in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS")},
         finished_utc=datetime.now(timezone.utc).isoformat(), prediction_settings_seed=args.seed[0],
         note="Zeros are unlabeled; test measures random hidden-edge recovery. Predictions use all recorded positives.")
