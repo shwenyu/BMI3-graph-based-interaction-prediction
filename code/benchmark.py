@@ -176,12 +176,158 @@ def git_state():
                 dirty=None if status is None else bool(status))
 
 
+# Optional checks use the same model functions and leave the original benchmark alone.
+STAGES = ("baseline", "active", "topk", "power", "availability")
+
+
+def ablation_scores(visible, data, setting):
+    stage, alpha = setting["stage"], setting["alpha"]
+    if stage == "baseline":
+        return two_sided(drug_only(visible, data.drug_similarity),
+                         protein_only(visible, data.protein_similarity), alpha)
+    k = None if stage == "active" else setting["k"]
+    drug, ds = neighbour_scores(visible, data.drug_similarity, data.drugs, k, setting["power"])
+    protein, ps = neighbour_scores(visible.T, data.protein_similarity, data.proteins, k, setting["power"])
+    if stage == "availability":
+        return fuse_scores(drug, protein.T, alpha, ds, ps)
+    return two_sided(drug, protein.T, alpha)
+
+
+def tune_ablation(train, data, validation, candidates, alphas, ks, powers):
+    trials = []
+    def try_weights(stage, k, power, drug, protein, ds=None, ps=None):
+        for alpha in alphas:
+            scores = (fuse_scores(drug, protein, alpha, ds, ps) if stage == "availability"
+                      else two_sided(drug, protein, alpha))
+            ap = ranking_metrics(validation[candidates], scores[candidates])["ap"]
+            trials.append(dict(stage=stage, k=k, power=power, alpha=alpha, validation_ap=ap))
+    try_weights("baseline", "", 1., drug_only(train, data.drug_similarity),
+                protein_only(train, data.protein_similarity))
+    drug, ds = neighbour_scores(train, data.drug_similarity, data.drugs)
+    protein, ps = neighbour_scores(train.T, data.protein_similarity, data.proteins)
+    try_weights("active", "", 1., drug, protein.T)
+    # Keep power=1 in this grid as the no-power control.
+    for k in ks:
+        for power in dict.fromkeys([1., *powers]):
+            drug, ds = neighbour_scores(train, data.drug_similarity, data.drugs, k, power)
+            protein, ps = neighbour_scores(train.T, data.protein_similarity, data.proteins, k, power)
+            if power == 1:
+                try_weights("topk", k, power, drug, protein.T)
+            try_weights("power", k, power, drug, protein.T)
+            try_weights("availability", k, power, drug, protein.T, ds, ps)
+    selected = {stage: max((r for r in trials if r["stage"] == stage), key=lambda r: r["validation_ap"])
+                for stage in STAGES}
+    return selected, trials
+
+
+def paired_deltas(rows):
+    """Descriptive changes on the same splits; overlapping splits are not independent studies."""
+    result = []
+    for dataset in sorted({r["dataset"] for r in rows}):
+        for previous, stage in zip(STAGES, STAGES[1:]):
+            before = {r["seed"]: r for r in rows if r["dataset"] == dataset and r["stage"] == previous}
+            after = {r["seed"]: r for r in rows if r["dataset"] == dataset and r["stage"] == stage}
+            for metric in METRICS[:4]:
+                changes = [after[s][metric] - before[s][metric] for s in before
+                           if before[s][metric] is not None and after[s][metric] is not None]
+                result.append(dict(dataset=dataset, metric=metric, previous=previous, stage=stage,
+                    runs=len(changes), mean_delta=float(np.mean(changes)) if changes else None,
+                    sd_delta=float(np.std(changes, ddof=1)) if len(changes) > 1 else None,
+                    min_delta=min(changes) if changes else None, max_delta=max(changes) if changes else None,
+                    wins=sum(d > 1e-12 for d in changes), ties=sum(abs(d) <= 1e-12 for d in changes),
+                    losses=sum(d < -1e-12 for d in changes)))
+    return result
+
+
+def run_study(args):
+    if args.output.exists() and any(p.name not in (".gitkeep", ".DS_Store") for p in args.output.iterdir()):
+        raise ValueError(f"Use a new or empty output directory: {args.output}")
+    args.output.mkdir(parents=True, exist_ok=True)
+    common = ("random", "target-degree", "drug-only", "protein-only", "two-sided")
+    core = ("drug-only", "protein-only", "two-sided", "two-sided-topk")
+    alignment, stability, ablation, parameters, records = [], [], [], [], []
+    for dataset in args.dataset:
+        data = load_dataset(args.input, dataset)
+        seeds = set(args.seed) | {42}
+        if dataset == "nr":
+            seeds.update(range(args.stability_seeds))
+        for seed in sorted(seeds):
+            train, validation, test = split_edges(data.interactions, seed, args.validation_fraction, args.test_fraction)
+            vc, tc = candidate_masks(data.interactions, validation, test)
+            visible = (train | validation).astype(np.uint8)
+            context = dict(dataset=dataset, seed=seed)
+            record = dict(**context, train=int(train.sum()), validation=int(validation.sum()),
+                          test=int(test.sum()), candidates=int(tc.sum()), background=int((data.interactions == 0).sum()),
+                          data=data.audit)
+            if seed == 42 or (dataset == "nr" and seed < args.stability_seeds):
+                selected, _ = tune(train, data, validation, vc, args.alphas, args.ks, args.powers)
+                scores, seconds = score_methods(visible, data, selected, seed, args.timing_repeats)
+                record["selected"] = selected
+                for method in set(common if seed == 42 else ()) | set(core if dataset == "nr" and seed < args.stability_seeds else ()):
+                    values, _ = evaluate(scores[method], test, tc, data.proteins, args.top_n)
+                    setting = selected.get(method, {})
+                    row = dict(**context, method=method, alpha=setting.get("alpha", ""),
+                               k=setting.get("k", ""), power=setting.get("power", ""), **values, score_seconds=seconds[method])
+                    if seed == 42 and method in common:
+                        alignment.append(row)
+                    if dataset == "nr" and seed < args.stability_seeds and method in core:
+                        stability.append(row)
+            if seed in args.seed:
+                chosen, trials = tune_ablation(train, data, validation, vc, args.alphas, args.ks, args.powers)
+                record["ablation_selected"] = chosen
+                parameters.extend(dict(**context, **r, selected=r is chosen[r["stage"]]) for r in trials)
+                unsupported_drugs = int((~(data.drug_similarity[:, visible.sum(axis=1) > 0] > 0).any(axis=1)).sum())
+                unsupported_proteins = int((~(data.protein_similarity[:, visible.sum(axis=0) > 0] > 0).any(axis=1)).sum())
+                for stage in STAGES:
+                    setting = chosen[stage]
+                    scores, seconds = timed(lambda: ablation_scores(visible, data, setting), args.timing_repeats)
+                    values, _ = evaluate(scores, test, tc, data.proteins, args.top_n)
+                    ablation.append(dict(**context, **setting, **values, score_seconds=seconds,
+                                         unsupported_drugs=unsupported_drugs, unsupported_proteins=unsupported_proteins))
+            records.append(record)
+            print(f"Study {dataset} seed {seed} complete", flush=True)
+    fields = ["dataset", "seed", "method", "alpha", "k", "power", "ap", "auroc", "positives", "background",
+              "macro_top_precision", "macro_top_recall", "eligible_drugs", "drugs_without_hidden", "top_n", "score_seconds"]
+    for name, rows in (("seed42", alignment), ("stability", stability)):
+        rows.sort(key=lambda r: (r["dataset"], r["seed"], r["method"]))
+        save_csv(args.output / f"{name}.csv", rows, fields)
+    save_csv(args.output / "ablation.csv", ablation)
+    save_csv(args.output / "ablation_parameters.csv", parameters)
+    save_csv(args.output / "paired.csv", paired_deltas(ablation))
+    if stability:
+        save_csv(args.output / "stability_summary.csv", aggregate(stability))
+        frequencies = {}
+        for r in stability:
+            if r["method"] in ("two-sided", "two-sided-topk"):
+                key = (r["method"], r["alpha"], r["k"], r["power"])
+                frequencies[key] = frequencies.get(key, 0) + 1
+        save_csv(args.output / "parameter_frequency.csv", [dict(method=m, alpha=a, k=k, power=p, count=n)
+                 for (m, a, k, p), n in frequencies.items()])
+    digest = hashlib.sha256()
+    for path in sorted(Path(__file__).parent.glob("*.py")):
+        digest.update(path.name.encode())
+        digest.update(path.read_bytes())
+    config = {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()}
+    receipt = dict(config=config, runs=records, git=git_state(), source_sha256=digest.hexdigest(),
+        python=sys.version, numpy=np.__version__, matplotlib=version("matplotlib") if not args.no_plots else None,
+        thread_environment={n: os.environ.get(n) for n in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS")},
+        finished_utc=datetime.now(timezone.utc).isoformat(), effective_ablation_powers=list(dict.fromkeys([1., *args.powers])),
+        note="Seed42 is alignment only. NR splits overlap; summaries are descriptive. Every ablation stage retunes validation AP; differences include parameter selection, not pure fixed-parameter causal effects.")
+    (args.output / "study.json").write_text(json.dumps(receipt, indent=2, allow_nan=False) + "\n")
+    if not args.no_plots:
+        from plot import plot_study
+        plot_study(args.output)
+    print(f"Saved alignment, stability and ablation checks to {args.output}")
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", nargs="+", default=["e", "ic", "gpcr", "nr"])
     parser.add_argument("--seed", nargs="+", type=int, default=[0, 1, 2, 3, 4])
     parser.add_argument("--input", type=Path, default=ROOT / "input")
-    parser.add_argument("--output", type=Path, default=ROOT / "output")
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--study", action="store_true", help="Run additional checks without changing the main benchmark")
+    parser.add_argument("--stability-seeds", type=int, default=20, help="Number of NR repeat splits in --study mode")
     parser.add_argument("--alphas", nargs="+", type=float, default=[0.5, 0.25, 0.75])
     parser.add_argument("--ks", nargs="+", type=int, default=[5, 10, 20, 50])
     parser.add_argument("--powers", nargs="+", type=float, default=[1., 2.])
@@ -193,6 +339,10 @@ def parse_args(argv=None):
     parser.add_argument("--no-plots", action="store_true")
     parser.add_argument("--no-predictions", action="store_true")
     args = parser.parse_args(argv)
+    if args.output is None:
+        args.output = ROOT / "output" / "validation" if args.study else ROOT / "output"
+    if args.study and args.stability_seeds < 2:
+        parser.error("stability-seeds must be at least two")
     if any(not np.isfinite(a) or not 0 <= a <= 1 for a in args.alphas):
         parser.error("alphas must be finite and between 0 and 1")
     if any(k < 1 for k in args.ks) or any(not np.isfinite(p) or p <= 0 for p in args.powers):
@@ -210,6 +360,8 @@ def parse_args(argv=None):
 # 4. Run in order, then write shared tables instead of one directory per seed.
 def main(argv=None):
     args = parse_args(argv)
+    if args.study:
+        return run_study(args)
     if args.output.exists() and any(p.name not in (".gitkeep", ".DS_Store") for p in args.output.iterdir()):
         raise ValueError(f"Use a new or empty output directory: {args.output}")
     args.output.mkdir(parents=True, exist_ok=True)

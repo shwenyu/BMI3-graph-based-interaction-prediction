@@ -1,4 +1,4 @@
-"""Small hand examples and one complete run. Run with: python code/check.py."""
+"""Small hand examples and complete experiment checks. Run: python code/check.py."""
 import contextlib
 import csv
 import io
@@ -8,10 +8,11 @@ import tempfile
 import unittest
 
 import numpy as np
-from data import align_square, candidate_masks, load_dataset, read_matrix, split_edges
+from data import Dataset, align_square, candidate_masks, load_dataset, read_matrix, split_edges
 from models import (drug_only, protein_only, neighbour_scores, two_sided,
                     fuse_scores, dti_only, target_degree, random_scores)
-from benchmark import aggregate, evaluate, main, ranking_metrics
+from benchmark import (ablation_scores, aggregate, evaluate, main, ranking_metrics,
+                       topk_scores, tune_ablation)
 from plot import METRICS, read_results
 
 
@@ -304,6 +305,103 @@ class RunChecks(unittest.TestCase):
         self.assertAlmostEqual(result["ap_sd"], .2 / np.sqrt(2))
         self.assertEqual((result["ap_n"], result["auroc_n"]), (2, 0))
         self.assertIsNone(result["auroc_mean"])
+
+
+class StudyChecks(unittest.TestCase):
+    def sample(self):
+        graph = np.array([[0, 0], [1, 0], [0, 1]])
+        similarity = np.array([[0, .8, .2], [.8, 0, .4], [.2, .4, 0]])
+        return Dataset(("d0", "d1", "d2"), ("p0", "p1"), graph,
+                       similarity, np.zeros((2, 2)), {})
+
+    def test_incremental_stage_scores_by_hand(self):
+        data = self.sample()
+        # The protein side has no weights. Plain fusion halves the drug vote;
+        # availability fusion uses the supported drug side at full weight.
+        cases = (("active", "", 1, [.4, .1]),
+                 ("topk", 1, 1, [.5, 0]),
+                 ("power", 2, 2, [8 / 17, .5 / 17]),
+                 ("availability", 2, 2, [16 / 17, 1 / 17]))
+        for stage, k, power, expected in cases:
+            setting = dict(stage=stage, k=k, power=power, alpha=.5)
+            actual = ablation_scores(data.interactions, data, setting)
+            np.testing.assert_allclose(actual[0], expected, atol=1e-14)
+
+    def test_ablation_endpoints_preserve_existing_methods(self):
+        data = self.sample()
+        setting = dict(stage="baseline", k="", power=1, alpha=.25)
+        baseline = two_sided(drug_only(data.interactions, data.drug_similarity),
+                             protein_only(data.interactions, data.protein_similarity), .25)
+        np.testing.assert_array_equal(ablation_scores(data.interactions, data, setting), baseline)
+        setting = dict(stage="availability", k=2, power=2, alpha=.75)
+        np.testing.assert_array_equal(ablation_scores(data.interactions, data, setting),
+                                      topk_scores(data.interactions, data, setting))
+
+    def test_validation_ties_follow_predeclared_grid(self):
+        graph = np.array([[1, 0, 0], [1, 1, 0], [0, 0, 1]], dtype=bool)
+        validation = np.zeros((3, 3), dtype=bool)
+        validation[0, 1] = True
+        data = Dataset(("d0", "d1", "d2"), ("p0", "p1", "p2"),
+                       graph.copy(), np.zeros((3, 3)), np.zeros((3, 3)), {})
+        candidates = ~graph
+        before = graph.copy()
+        selected, trials = tune_ablation(graph, data, validation, candidates,
+                                         [.75, .25], [2, 1], [2, 1])
+        self.assertEqual(set(selected), {"baseline", "active", "topk", "power", "availability"})
+        self.assertTrue(all(row["alpha"] == .75 for row in selected.values()))
+        self.assertEqual(selected["topk"]["k"], 2)
+        # The study explicitly keeps the preceding power=1 configuration first.
+        self.assertEqual(selected["power"]["power"], 1)
+        self.assertEqual(selected["availability"]["power"], 1)
+        # All scores are zero, so grouped AP is just the positive prevalence.
+        expected_ap = validation[candidates].sum() / candidates.sum()
+        self.assertTrue(all(abs(row["validation_ap"] - expected_ap) < 1e-14 for row in trials))
+        np.testing.assert_array_equal(graph, before)
+        np.testing.assert_array_equal(data.interactions, before)
+
+    def test_complete_optional_study_is_separate_and_reproducible(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            ids = tuple(f"d{i}" for i in range(5)), tuple(f"p{i}" for i in range(5))
+            graph = np.eye(5, dtype=int) + np.roll(np.eye(5, dtype=int), 1, axis=1)
+            for suffix, rows, columns, matrix in (
+                ("admat_dgc", ids[0], ids[1], graph),
+                ("simmat_dc", ids[0], ids[0], np.ones((5, 5))),
+                ("simmat_dg", ids[1], ids[1], np.ones((5, 5)))):
+                lines = ["\t".join(columns)]
+                lines.extend("\t".join([name, *map(str, values)]) for name, values in zip(rows, matrix))
+                (root / f"nr_{suffix}.txt").write_text("\n".join(lines) + "\n")
+            output = root / "validation"
+            args = ["--study", "--dataset", "nr", "--seed", "0", "--stability-seeds", "2",
+                    "--input", str(root), "--output", str(output), "--ks", "2", "--powers", "1",
+                    "--alphas", ".5", "--timing-repeats", "1", "--no-plots"]
+            with contextlib.redirect_stdout(io.StringIO()):
+                main(args)
+            tables = {}
+            for name in ("seed42", "stability", "ablation", "ablation_parameters", "paired"):
+                with (output / f"{name}.csv").open(newline="") as handle:
+                    tables[name] = list(csv.DictReader(handle))
+            self.assertEqual({name: len(rows) for name, rows in tables.items()},
+                             dict(seed42=5, stability=8, ablation=5, ablation_parameters=5, paired=16))
+            self.assertEqual({row["seed"] for row in tables["seed42"]}, {"42"})
+            self.assertEqual({row["seed"] for row in tables["stability"]}, {"0", "1"})
+            self.assertEqual({row["stage"] for row in tables["ablation"]},
+                             {"baseline", "active", "topk", "power", "availability"})
+            for name in ("seed42", "stability", "ablation"):
+                self.assertTrue(all(int(row["positives"]) == 1 and int(row["background"]) == 15
+                                    for row in tables[name]))
+            self.assertFalse((output / "metrics.csv").exists())
+            by_stage = {row["stage"]: row for row in tables["ablation"]}
+            for row in tables["paired"]:
+                delta = float(by_stage[row["stage"]][row["metric"]]) - float(by_stage[row["previous"]][row["metric"]])
+                self.assertAlmostEqual(float(row["mean_delta"]), delta)
+                self.assertEqual(int(row["runs"]), 1)
+                self.assertEqual(int(row["wins"]) + int(row["ties"]) + int(row["losses"]), 1)
+            receipt = json.loads((output / "study.json").read_text())
+            self.assertEqual(len(receipt["source_sha256"]), 64)
+            self.assertEqual(receipt["config"]["stability_seeds"], 2)
+            with self.assertRaises(ValueError):
+                main(args)
 
 
 if __name__ == "__main__":

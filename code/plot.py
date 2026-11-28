@@ -108,6 +108,110 @@ def plot_results(tables, output):
     plt.close(fig)
 
 
+def plot_study(output):
+    """Keep single-seed, repeated-split and component comparisons separate."""
+    import matplotlib
+    matplotlib.use("Agg")
+    from matplotlib import pyplot as plt
+    from matplotlib.ticker import PercentFormatter
+
+    output = Path(output)
+    def read(name):
+        with (output / f"{name}.csv").open(newline="") as handle:
+            return list(csv.DictReader(handle))
+    def number(row, metric):
+        value = optional_number(row[metric], metric, metric != "score_seconds")
+        return np.nan if value is None else value
+    def finish(fig, name):
+        for extension in ("png", "pdf"):
+            fig.savefig(output / f"{name}.{extension}", dpi=220)
+        plt.close(fig)
+    def style(ax, metric):
+        ax.grid(axis="y", color="#E5E5E5")
+        ax.set_axisbelow(True)
+        ax.spines[["top", "right"]].set_visible(False)
+        if metric != "score_seconds":
+            ax.yaxis.set_major_formatter(PercentFormatter(1))
+
+    # The colleague's view: five shared methods and one fixed split.
+    rows = read("seed42")
+    top_n = int(rows[0].get("top_n", 10))
+    methods = ("random", "target-degree", "drug-only", "protein-only", "two-sided")
+    labels = ("Average precision", "AUROC", f"Top-{top_n} macro precision", f"Top-{top_n} macro recall", "Scoring time (ms, log scale)")
+    fig, axes = plt.subplots(2, 3, figsize=(15, 8))
+    panels = (axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1], axes[0, 2])
+    for ax, metric, label in zip(panels, METRICS, labels):
+        for code in DATASETS:
+            table = {r["method"]: r for r in rows if r["dataset"] == code}
+            if not table:
+                continue
+            name, color, marker, line = DATASETS[code]
+            values = [number(table[m], metric) for m in methods]
+            if metric == "score_seconds":
+                values = [v * 1000 if v > 0 else np.nan for v in values]
+            ax.plot(range(5), values, label=name, color=color, marker=marker, linestyle=line)
+        ax.set_xticks(range(5), [METHODS[m] for m in methods], rotation=20, ha="right")
+        ax.set_title(label)
+        style(ax, metric)
+        if metric == "score_seconds":
+            ax.set_yscale("log")
+        else:
+            ax.set_ylim(bottom=0, top=1 if metric == "auroc" else None)
+    axes[1, 2].axis("off")
+    axes[1, 2].legend(*panels[0].get_legend_handles_labels(), loc="center", frameon=False)
+    fig.suptitle("DTI benchmark: seed 42, five shared methods")
+    fig.tight_layout(rect=(0, 0, 1, .95))
+    finish(fig, "seed42")
+
+    # Repeated NR splits: the same seed pairs the fixed and enhanced methods.
+    rows = read("stability")
+    if rows:
+        values = {(int(r["seed"]), r["method"]): number(r, "ap") for r in rows}
+        seeds = sorted({seed for seed, _ in values})
+        methods = ("drug-only", "protein-only", "two-sided", "two-sided-topk")
+        fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+        for method, color in zip(methods, ("#0072B2", "#CC79A7", "#606060", "#E69F00")):
+            axes[0].plot(seeds, [values[s, method] for s in seeds], marker="o", markersize=4,
+                         label=METHODS[method], color=color)
+        delta = [values[s, "two-sided-topk"] - values[s, "two-sided"] for s in seeds]
+        axes[1].bar(seeds, delta, color=["#E69F00" if v >= 0 else "#606060" for v in delta])
+        axes[1].axhline(0, color="black", linewidth=.8)
+        axes[0].set_ylabel("AP")
+        axes[0].set_ylim(bottom=0)
+        axes[1].set_ylabel("AP difference: Top-k minus fixed fusion")
+        for ax in axes:
+            ax.set_xlabel("Split seed")
+            ax.set_xticks(seeds[::max(1, len(seeds) // 10)])
+            style(ax, "ap")
+        axes[0].legend(frameon=False, fontsize=8)
+        fig.suptitle("Nuclear receptor: repeated edge splits, paired by seed")
+        fig.tight_layout(rect=(0, .05, 1, .93))
+        fig.text(.5, .01, "Repeated splits reuse the same dataset; they are not independent datasets.", ha="center", fontsize=9)
+        finish(fig, "stability")
+
+    rows = read("ablation")
+    stages = ("baseline", "active", "topk", "power", "availability")
+    labels = ("Fixed fusion", "Active neighbours", "+ Top-k", "+ Power", "+ Availability")
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    for ax, metric, title in zip(axes.flat, METRICS[:4], ("Average precision", "AUROC", f"Top-{top_n} macro precision", f"Top-{top_n} macro recall")):
+        for code in DATASETS:
+            if not any(r["dataset"] == code for r in rows):
+                continue
+            groups = [[number(r, metric) for r in rows if r["dataset"] == code and r["stage"] == stage] for stage in stages]
+            means = [np.mean(g) for g in groups]
+            errors = [np.std(g, ddof=1) if len(g) > 1 else 0 for g in groups]
+            name, color, marker, line = DATASETS[code]
+            ax.errorbar(range(5), means, yerr=errors, label=name, color=color,
+                        marker=marker, linestyle=line, capsize=3)
+        ax.set_xticks(range(5), labels, rotation=20, ha="right")
+        ax.set_title(title)
+        style(ax, metric)
+    fig.legend(*axes[0, 0].get_legend_handles_labels(), loc="lower center", ncol=4, frameon=False)
+    fig.suptitle("Component study: validation-selected settings, mean and seed SD")
+    fig.tight_layout(rect=(0, .07, 1, .95))
+    finish(fig, "ablation")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path(__file__).resolve().parent.parent / "output")
