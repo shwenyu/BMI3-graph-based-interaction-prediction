@@ -1,4 +1,12 @@
-# Hanyu Shou · BMI3 Python prototype
+# BMI3 implementation
+
+The complete run, plotting and prediction instructions are now in the root
+`README.md`. Method definitions and timing conventions are in `docs/METHODS.md`.
+Authorship is disclosed in `AI_PROVENANCE.md`. The earlier prototype notes below
+describe the inherited starting point; the current CLI defaults and seven-method
+benchmark supersede them.
+
+## Earlier prototype notes
 
 Run from the branch root with Python 3.10+ and NumPy installed.
 

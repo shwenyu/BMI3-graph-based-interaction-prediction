@@ -1,9 +1,17 @@
 """Ranking metrics against hidden recorded edges, not biological truth."""
 import numpy as np
+import operator
+
+
+def binary_labels(values, name):
+    values = np.asarray(values)
+    if not np.isin(values, [0, 1]).all():
+        raise ValueError(f"{name} must contain only zero/one or boolean values")
+    return values.astype(bool)
 
 
 def ranking_metrics(labels, scores):
-    labels, scores = np.asarray(labels, dtype=bool), np.asarray(scores, dtype=float)
+    labels, scores = binary_labels(labels, "Labels"), np.asarray(scores, dtype=float)
     if labels.shape != scores.shape or labels.ndim != 1 or not len(labels):
         raise ValueError("Expected equally sized nonempty 1-D arrays")
     if not np.isfinite(scores).all():
@@ -41,8 +49,24 @@ def ranking_metrics(labels, scores):
 
 
 def evaluate(scores, hidden, candidates, proteins, top_n=10):
+    scores = np.asarray(scores, dtype=float)
+    hidden = binary_labels(hidden, "Hidden labels")
+    candidates = binary_labels(candidates, "Candidates")
+    if scores.ndim != 2 or not all(scores.shape):
+        raise ValueError("Expected a nonempty 2-D score matrix")
     if scores.shape != hidden.shape or candidates.shape != hidden.shape:
         raise ValueError("Scores, labels and candidates must have identical shapes")
+    if not np.isfinite(scores).all():
+        raise ValueError("Nonfinite prediction scores")
+    proteins = tuple(proteins)
+    if len(proteins) != scores.shape[1] or len(set(proteins)) != len(proteins):
+        raise ValueError("Expected one unique protein identifier per column")
+    try:
+        if isinstance(top_n, (bool, np.bool_)):
+            raise TypeError
+        top_n = operator.index(top_n)
+    except TypeError as error:
+        raise ValueError("top_n must be a positive integer") from error
     if top_n <= 0:
         raise ValueError("top_n must be positive")
     if not np.all(candidates[hidden]):
@@ -61,8 +85,8 @@ def evaluate(scores, hidden, candidates, proteins, top_n=10):
                          hits=hits, precision=hits / len(top) if top else None,
                          recall=hits / positives if positives else None))
     eligible = [row for row in rows if row["hidden"] > 0]
-    pooled.update(macro_top_precision=float(np.mean([r["precision"] for r in eligible])),
-                  macro_top_recall=float(np.mean([r["recall"] for r in eligible])),
+    pooled.update(macro_top_precision=float(np.mean([r["precision"] for r in eligible])) if eligible else None,
+                  macro_top_recall=float(np.mean([r["recall"] for r in eligible])) if eligible else None,
                   eligible_drugs=len(eligible), drugs_without_hidden=len(rows)-len(eligible),
                   top_n=top_n)
     return pooled, rows, curves

@@ -1,14 +1,9 @@
-"""Plot four test metrics in a single figure for the Yamanishi datasets."""
+"""Plot seed-averaged benchmark metrics and scoring time from summary.csv."""
 import argparse
 import csv
 from pathlib import Path
 
-import matplotlib
-
-matplotlib.use("Agg")
-from matplotlib import pyplot as plt
-from matplotlib.patches import Rectangle
-from matplotlib.ticker import PercentFormatter
+import numpy as np
 
 
 DATASETS = {
@@ -20,89 +15,159 @@ DATASETS = {
 METHODS = {
     "random": "Random",
     "target-degree": "Target degree",
+    "dti-only": "DTI paths",
     "drug-only": "Drug only",
     "protein-only": "Protein only",
     "two-sided": "Two-sided",
+    "two-sided-topk": "Top-k fusion",
 }
+METRICS = ("ap", "auroc", "macro_top_precision", "macro_top_recall", "score_seconds")
 
 
-def read_results(results, seed):
-    tables = {}
-    for code in DATASETS:
-        path = results / f"{code}_seed{seed}" / "test.csv"
+def optional_number(value, label, bounded=False):
+    """An empty cell is undefined; explicit NaN/Inf is malformed input."""
+    if value is None or value.strip() in ("", "None", "null"):
+        return None
+    number = float(value)
+    if not np.isfinite(number) or number < 0 or (bounded and number > 1):
+        raise ValueError(f"Invalid {label}: {value}")
+    return number
+
+
+def read_results(results, seed=None):
+    """Return dataset -> method -> numeric row. Optional seed reads old run CSVs."""
+    results = Path(results)
+    rows = []
+    if seed is None:
+        path = results / "summary.csv"
         with path.open(newline="") as handle:
-            rows = list(csv.DictReader(handle))
-        table = {row["method"]: row for row in rows}
-        if len(table) != len(rows) or not set(METHODS).issubset(table):
-            raise ValueError(f"Expected one row per benchmark method in {path}")
-        tables[code] = table
+            reader = csv.DictReader(handle)
+            required = {"dataset", "method", "runs", "top_n"}
+            required.update(f"{metric}_{stat}" for metric in METRICS for stat in ("mean", "sd"))
+            if not required.issubset(reader.fieldnames or []):
+                raise ValueError(f"Missing summary columns in {path}")
+            rows = list(reader)
+    else:
+        # Compatibility with the prototype's dataset_seedN/test.csv layout.
+        paths = sorted(results.glob(f"*_seed{seed}/test.csv"))
+        if not paths:
+            raise ValueError(f"No results found for seed {seed}")
+        for path in paths:
+            code = path.parent.name.rsplit("_seed", 1)[0]
+            with path.open(newline="") as handle:
+                for original in csv.DictReader(handle):
+                    row = dict(dataset=code, method=original["method"], runs="1",
+                               top_n=original["top_n"])
+                    for metric in METRICS:
+                        row[f"{metric}_mean"] = original.get(metric, "")
+                        row[f"{metric}_sd"] = "0" if original.get(metric, "") else ""
+                    rows.append(row)
+    if not rows:
+        raise ValueError("Result table is empty")
+    tables = {}
+    top_counts = set()
+    for original in rows:
+        code, method = original["dataset"].strip(), original["method"].strip()
+        if not code or method not in METHODS:
+            raise ValueError(f"Unknown dataset/method: {code}/{method}")
+        table = tables.setdefault(code, {})
+        if method in table:
+            raise ValueError(f"Duplicate result for {code}/{method}")
+        row = {"runs": int(original["runs"]), "top_n": int(original["top_n"])}
+        if row["runs"] < 1 or row["top_n"] < 1:
+            raise ValueError("runs and top_n must be positive integers")
+        top_counts.add(row["top_n"])
+        for metric in METRICS:
+            mean = optional_number(original[f"{metric}_mean"], metric, metric != "score_seconds")
+            sd = optional_number(original[f"{metric}_sd"], metric + " standard deviation")
+            if mean is None and sd is not None:
+                raise ValueError(f"Standard deviation without a mean: {code}/{method}/{metric}")
+            row[f"{metric}_mean"], row[f"{metric}_sd"] = mean, sd
+        table[method] = row
+    if len(top_counts) != 1:
+        raise ValueError("All rows must use the same top-N cutoff")
+    method_sets = {tuple(sorted(table)) for table in tables.values()}
+    if len(method_sets) != 1:
+        raise ValueError("All datasets must contain the same methods")
     return tables
 
 
-def plot_metric(ax, tables, metric, label):
-    positions = list(range(len(METHODS)))
-    largest = 0
-
-    for code, (name, color, marker, line_style) in DATASETS.items():
-        values = [float(tables[code][method][metric]) for method in METHODS]
-        if any(not 0 <= value <= 1 for value in values):
-            raise ValueError(f"{code}: {metric} must contain scores from 0 to 1")
-        ax.plot(positions, values, label=name, color=color, marker=marker,
-                linestyle=line_style, linewidth=2, markersize=5)
-        largest = max(largest, max(values))
-
-    ax.set_xticks(positions, list(METHODS.values()))
-    ax.set_xlim(-0.25, len(METHODS) - 0.75)
-    ax.set_ylim(0, min(1, max(0.05, largest * 1.12)))
-    ax.yaxis.set_major_formatter(PercentFormatter(1))
+def draw_metric(ax, tables, metric, label, methods):
+    positions = np.arange(len(methods))
+    for index, (code, table) in enumerate(tables.items()):
+        name, color, marker, style = DATASETS.get(
+            code, (code, f"C{index % 10}", "o", "-"))
+        values = [table[method][f"{metric}_mean"] for method in methods]
+        errors = [table[method][f"{metric}_sd"] for method in methods]
+        values = np.array([np.nan if v is None else v for v in values])
+        errors = np.array([0 if e is None else e for e in errors])
+        ax.errorbar(positions, values, yerr=errors, label=name, color=color,
+                    marker=marker, linestyle=style, linewidth=1.6, markersize=5,
+                    capsize=3, elinewidth=1)
+    ax.set_xticks(positions, [METHODS[m] for m in methods], rotation=25, ha="right")
+    ax.set_ylabel(label)
+    ax.set_xlim(-0.3, len(methods) - 0.7)
+    ax.set_ylim(bottom=0)
+    if metric != "score_seconds":
+        # Seed SD bars can extend past the valid metric range; show their full extent.
+        top = ax.get_ylim()[1]
+        ax.set_ylim(top=min(1.1, max(0.05, top)))
+    ax.grid(axis="y", color="#E5E5E5", linewidth=0.8)
     ax.set_axisbelow(True)
-    ax.grid(color="#EAEAEA", linewidth=0.8)
-    for spine in ax.spines.values():
-        spine.set_color("#454545")
-        spine.set_linewidth(0.8)
+    ax.spines[["top", "right"]].set_visible(False)
 
-    # Draw a grey metric strip above each panel.
-    strip_height = 0.11
-    ax.add_patch(Rectangle((0, 1), 1, strip_height, transform=ax.transAxes,
-                           facecolor="#E3E3E3", edgecolor="#454545",
-                           linewidth=0.8, clip_on=False))
-    ax.text(0.5, 1 + strip_height / 2, label, transform=ax.transAxes,
-            ha="center", va="center", fontsize=11, fontweight="bold")
+
+def plot_results(tables, output):
+    # Matplotlib is optional for running the prediction benchmark itself.
+    import matplotlib
+    matplotlib.use("Agg")
+    from matplotlib import pyplot as plt
+
+    output = Path(output)
+    output.mkdir(parents=True, exist_ok=True)
+    methods = [m for m in METHODS if m in next(iter(tables.values()))]
+    top_n = next(iter(next(iter(tables.values())).values()))["top_n"]
+    labels = {
+        "ap": "Average precision",
+        "auroc": "AUROC",
+        "macro_top_precision": f"Macro precision@min({top_n}, candidates)",
+        "macro_top_recall": f"Macro recall@{top_n}",
+    }
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    for ax, (metric, label) in zip(axes.flat, labels.items()):
+        draw_metric(ax, tables, metric, label, methods)
+    handles, legend_labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, legend_labels, loc="lower center", ncol=min(4, len(tables)),
+               frameon=False, bbox_to_anchor=(0.5, 0.03))
+    fig.suptitle("Held-out interaction recovery: mean and seed standard deviation", fontsize=13)
+    fig.text(0.5, 0.005, "Top-N macro metrics include only drugs with held-out positives.",
+             ha="center", fontsize=9)
+    fig.tight_layout(rect=(0, 0.09, 1, 0.96))
+    for extension in ("png", "pdf"):
+        fig.savefig(output / f"benchmark.{extension}", dpi=220)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    draw_metric(ax, tables, "score_seconds", "Scoring time (seconds)", methods)
+    ax.set_title("Scoring time: mean and seed standard deviation")
+    ax.legend(frameon=False, ncol=min(4, len(tables)))
+    fig.tight_layout()
+    for extension in ("png", "pdf"):
+        fig.savefig(output / f"runtime.{extension}", dpi=220)
+    plt.close(fig)
 
 
 def main():
     root = Path(__file__).resolve().parent.parent
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--results", type=Path, default=root / "output")
+    parser.add_argument("--results", type=Path, default=root / "output" / "benchmark")
     parser.add_argument("--output", type=Path, help="Directory for PNG and PDF figures")
-    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--seed", type=int, help="Read legacy dataset_seedN/test.csv files")
     args = parser.parse_args()
-
     tables = read_results(args.results, args.seed)
-    top_counts = {int(row["top_n"]) for table in tables.values() for row in table.values()}
-    if len(top_counts) != 1:
-        raise ValueError("All methods and datasets must use the same top-N cutoff")
-    top_n = top_counts.pop()
-    metrics = {
-        "ap": "Average precision (AP)",
-        "auroc": "AUROC",
-        "macro_top_precision": f"Mean precision in top {top_n} targets",
-        "macro_top_recall": f"Mean recall in top {top_n} targets",
-    }
-    output = args.output or args.results / f"figures_seed{args.seed}"
-    output.mkdir(parents=True, exist_ok=True)
-    fig, axes = plt.subplots(2, 2, figsize=(11, 7))
-    fig.subplots_adjust(left=0.065, right=0.98, bottom=0.14, top=0.95,
-                        wspace=0.18, hspace=0.43)
-    for ax, (metric, label) in zip(axes.flat, metrics.items()):
-        plot_metric(ax, tables, metric, label)
-    handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.03),
-               ncol=4, frameon=False, handlelength=2.8)
-    fig.savefig(output / "benchmark.png", dpi=300)
-    fig.savefig(output / "benchmark.pdf")
-    plt.close(fig)
-    print(f"Saved the 2x2 benchmark figure as PNG and PDF in {output}")
+    output = args.output or args.results / "figures"
+    plot_results(tables, output)
+    print(f"Saved benchmark and runtime figures (PNG/PDF) in {output}")
 
 
 if __name__ == "__main__":

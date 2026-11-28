@@ -1,4 +1,6 @@
 __pycache__/
+.venv/
+*.pyc
 input/*
 !input/.gitkeep
 !input/*_admat_dgc.txt
