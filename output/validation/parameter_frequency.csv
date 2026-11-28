@@ -1,0 +1,12 @@
+method,alpha,k,power,count
+two-sided,0.25,,1.0,12
+two-sided-topk,0.5,10,2.0,1
+two-sided-topk,0.25,5,1.0,6
+two-sided,0.75,,1.0,5
+two-sided-topk,0.5,5,1.0,4
+two-sided-topk,0.75,5,1.0,3
+two-sided-topk,0.5,5,2.0,1
+two-sided-topk,0.75,5,2.0,1
+two-sided,0.5,,1.0,3
+two-sided-topk,0.25,5,2.0,3
+two-sided-topk,0.25,10,2.0,1
