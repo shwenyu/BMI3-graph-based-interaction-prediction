@@ -1,0 +1,1263 @@
+{
+  "config": {
+    "dataset": [
+      "e",
+      "ic",
+      "gpcr",
+      "nr"
+    ],
+    "seed": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "input": "input",
+    "output": "output",
+    "alphas": [
+      0.5,
+      0.25,
+      0.75
+    ],
+    "ks": [
+      5,
+      10,
+      20,
+      50
+    ],
+    "powers": [
+      1.0,
+      2.0
+    ],
+    "validation_fraction": 0.1,
+    "test_fraction": 0.1,
+    "top_n": 10,
+    "timing_repeats": 3,
+    "compare_backends": true,
+    "no_plots": false,
+    "no_predictions": false
+  },
+  "runs": [
+    {
+      "dataset": "e",
+      "seed": 0,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.4955806339312478
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.7025365579802615
+        }
+      },
+      "tuning_seconds": 1.585380458040163,
+      "train": 2342,
+      "validation": 292,
+      "test": 292,
+      "background": 292554,
+      "test_candidates": 292846,
+      "cold_drugs": 23,
+      "cold_proteins": 29,
+      "test_pairs_with_cold_drug": 24,
+      "test_pairs_with_cold_protein": 31,
+      "data": {
+        "dataset": "e",
+        "drugs": 445,
+        "proteins": 664,
+        "edges": 2926,
+        "density": 0.009902531474211452,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.091667,
+            "nonunit_diagonal": 17
+          },
+          "protein": {
+            "minimum": 0.00397573887441264,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "e_simmat_dc.txt": "28105b9570c91b4eac688eaf92db2e4aacb7117bc8665cab527fc5d45cd83606",
+          "e_simmat_dg.txt": "14816c2bba2193d62f52ab53bd51fe9a490b28e98cf33df392a5da2bf24e5607",
+          "e_admat_dgc.txt": "bf73f8f0c1a71f9fe92d1e0d8a1065a1122b383532cd47fc73df1cb0d9ba6c10",
+          "bind_orfhsa_drug_e.txt": "54287ef4cde5713126187f6a399eccbcfebe4c2aa227b5ff4610a3baeb572e28"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "e",
+      "seed": 1,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.5099969205990189
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.6655550203200703
+        }
+      },
+      "tuning_seconds": 1.609437333070673,
+      "train": 2342,
+      "validation": 292,
+      "test": 292,
+      "background": 292554,
+      "test_candidates": 292846,
+      "cold_drugs": 23,
+      "cold_proteins": 33,
+      "test_pairs_with_cold_drug": 24,
+      "test_pairs_with_cold_protein": 35,
+      "data": {
+        "dataset": "e",
+        "drugs": 445,
+        "proteins": 664,
+        "edges": 2926,
+        "density": 0.009902531474211452,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.091667,
+            "nonunit_diagonal": 17
+          },
+          "protein": {
+            "minimum": 0.00397573887441264,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "e_simmat_dc.txt": "28105b9570c91b4eac688eaf92db2e4aacb7117bc8665cab527fc5d45cd83606",
+          "e_simmat_dg.txt": "14816c2bba2193d62f52ab53bd51fe9a490b28e98cf33df392a5da2bf24e5607",
+          "e_admat_dgc.txt": "bf73f8f0c1a71f9fe92d1e0d8a1065a1122b383532cd47fc73df1cb0d9ba6c10",
+          "bind_orfhsa_drug_e.txt": "54287ef4cde5713126187f6a399eccbcfebe4c2aa227b5ff4610a3baeb572e28"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "e",
+      "seed": 2,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.5409584843774418
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.6566037198351204
+        }
+      },
+      "tuning_seconds": 1.5901282919803634,
+      "train": 2342,
+      "validation": 292,
+      "test": 292,
+      "background": 292554,
+      "test_candidates": 292846,
+      "cold_drugs": 25,
+      "cold_proteins": 31,
+      "test_pairs_with_cold_drug": 26,
+      "test_pairs_with_cold_protein": 33,
+      "data": {
+        "dataset": "e",
+        "drugs": 445,
+        "proteins": 664,
+        "edges": 2926,
+        "density": 0.009902531474211452,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.091667,
+            "nonunit_diagonal": 17
+          },
+          "protein": {
+            "minimum": 0.00397573887441264,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "e_simmat_dc.txt": "28105b9570c91b4eac688eaf92db2e4aacb7117bc8665cab527fc5d45cd83606",
+          "e_simmat_dg.txt": "14816c2bba2193d62f52ab53bd51fe9a490b28e98cf33df392a5da2bf24e5607",
+          "e_admat_dgc.txt": "bf73f8f0c1a71f9fe92d1e0d8a1065a1122b383532cd47fc73df1cb0d9ba6c10",
+          "bind_orfhsa_drug_e.txt": "54287ef4cde5713126187f6a399eccbcfebe4c2aa227b5ff4610a3baeb572e28"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "e",
+      "seed": 3,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.4905880288692498
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.6851090294086737
+        }
+      },
+      "tuning_seconds": 1.6060994160361588,
+      "train": 2342,
+      "validation": 292,
+      "test": 292,
+      "background": 292554,
+      "test_candidates": 292846,
+      "cold_drugs": 26,
+      "cold_proteins": 27,
+      "test_pairs_with_cold_drug": 28,
+      "test_pairs_with_cold_protein": 29,
+      "data": {
+        "dataset": "e",
+        "drugs": 445,
+        "proteins": 664,
+        "edges": 2926,
+        "density": 0.009902531474211452,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.091667,
+            "nonunit_diagonal": 17
+          },
+          "protein": {
+            "minimum": 0.00397573887441264,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "e_simmat_dc.txt": "28105b9570c91b4eac688eaf92db2e4aacb7117bc8665cab527fc5d45cd83606",
+          "e_simmat_dg.txt": "14816c2bba2193d62f52ab53bd51fe9a490b28e98cf33df392a5da2bf24e5607",
+          "e_admat_dgc.txt": "bf73f8f0c1a71f9fe92d1e0d8a1065a1122b383532cd47fc73df1cb0d9ba6c10",
+          "bind_orfhsa_drug_e.txt": "54287ef4cde5713126187f6a399eccbcfebe4c2aa227b5ff4610a3baeb572e28"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "e",
+      "seed": 4,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.5433705225201296
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.7004732240024601
+        }
+      },
+      "tuning_seconds": 1.604903000057675,
+      "train": 2342,
+      "validation": 292,
+      "test": 292,
+      "background": 292554,
+      "test_candidates": 292846,
+      "cold_drugs": 16,
+      "cold_proteins": 33,
+      "test_pairs_with_cold_drug": 17,
+      "test_pairs_with_cold_protein": 34,
+      "data": {
+        "dataset": "e",
+        "drugs": 445,
+        "proteins": 664,
+        "edges": 2926,
+        "density": 0.009902531474211452,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.091667,
+            "nonunit_diagonal": 17
+          },
+          "protein": {
+            "minimum": 0.00397573887441264,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "e_simmat_dc.txt": "28105b9570c91b4eac688eaf92db2e4aacb7117bc8665cab527fc5d45cd83606",
+          "e_simmat_dg.txt": "14816c2bba2193d62f52ab53bd51fe9a490b28e98cf33df392a5da2bf24e5607",
+          "e_admat_dgc.txt": "bf73f8f0c1a71f9fe92d1e0d8a1065a1122b383532cd47fc73df1cb0d9ba6c10",
+          "bind_orfhsa_drug_e.txt": "54287ef4cde5713126187f6a399eccbcfebe4c2aa227b5ff4610a3baeb572e28"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "ic",
+      "seed": 0,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.41776684886566257
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.5206964447829064
+        }
+      },
+      "tuning_seconds": 0.23479000001680106,
+      "train": 1182,
+      "validation": 147,
+      "test": 147,
+      "background": 41364,
+      "test_candidates": 41511,
+      "cold_drugs": 13,
+      "cold_proteins": 3,
+      "test_pairs_with_cold_drug": 13,
+      "test_pairs_with_cold_protein": 3,
+      "data": {
+        "dataset": "ic",
+        "drugs": 210,
+        "proteins": 204,
+        "edges": 1476,
+        "density": 0.034453781512605045,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.164871,
+            "nonunit_diagonal": 5
+          },
+          "protein": {
+            "minimum": 0.00231565935342984,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "ic_simmat_dc.txt": "c1078ca88528d75ddb43d4ed2559391d7d8f5375ec572e6e9112e519d9cdbbf9",
+          "ic_simmat_dg.txt": "e15626145623124ad42a45412c544d5fed5e079003727df784d29ed3ca72efef",
+          "ic_admat_dgc.txt": "ac9df3498bc12af5174503e5f1e09ce26a6d78d753861a5eca55425f9f9ae2c9",
+          "bind_orfhsa_drug_ic.txt": "31166929b5b0837acc1f2553061365731192fc39c1e2916ea8d84874fac96bf4"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "ic",
+      "seed": 1,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.35412507115489006
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 20,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.49929160600277994
+        }
+      },
+      "tuning_seconds": 0.2396761670242995,
+      "train": 1182,
+      "validation": 147,
+      "test": 147,
+      "background": 41364,
+      "test_candidates": 41511,
+      "cold_drugs": 9,
+      "cold_proteins": 3,
+      "test_pairs_with_cold_drug": 9,
+      "test_pairs_with_cold_protein": 3,
+      "data": {
+        "dataset": "ic",
+        "drugs": 210,
+        "proteins": 204,
+        "edges": 1476,
+        "density": 0.034453781512605045,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.164871,
+            "nonunit_diagonal": 5
+          },
+          "protein": {
+            "minimum": 0.00231565935342984,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "ic_simmat_dc.txt": "c1078ca88528d75ddb43d4ed2559391d7d8f5375ec572e6e9112e519d9cdbbf9",
+          "ic_simmat_dg.txt": "e15626145623124ad42a45412c544d5fed5e079003727df784d29ed3ca72efef",
+          "ic_admat_dgc.txt": "ac9df3498bc12af5174503e5f1e09ce26a6d78d753861a5eca55425f9f9ae2c9",
+          "bind_orfhsa_drug_ic.txt": "31166929b5b0837acc1f2553061365731192fc39c1e2916ea8d84874fac96bf4"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "ic",
+      "seed": 2,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.33226990797375183
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 20,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.45437752479118354
+        }
+      },
+      "tuning_seconds": 0.2387927919626236,
+      "train": 1182,
+      "validation": 147,
+      "test": 147,
+      "background": 41364,
+      "test_candidates": 41511,
+      "cold_drugs": 10,
+      "cold_proteins": 2,
+      "test_pairs_with_cold_drug": 10,
+      "test_pairs_with_cold_protein": 3,
+      "data": {
+        "dataset": "ic",
+        "drugs": 210,
+        "proteins": 204,
+        "edges": 1476,
+        "density": 0.034453781512605045,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.164871,
+            "nonunit_diagonal": 5
+          },
+          "protein": {
+            "minimum": 0.00231565935342984,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "ic_simmat_dc.txt": "c1078ca88528d75ddb43d4ed2559391d7d8f5375ec572e6e9112e519d9cdbbf9",
+          "ic_simmat_dg.txt": "e15626145623124ad42a45412c544d5fed5e079003727df784d29ed3ca72efef",
+          "ic_admat_dgc.txt": "ac9df3498bc12af5174503e5f1e09ce26a6d78d753861a5eca55425f9f9ae2c9",
+          "bind_orfhsa_drug_ic.txt": "31166929b5b0837acc1f2553061365731192fc39c1e2916ea8d84874fac96bf4"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "ic",
+      "seed": 3,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.4260201430980376
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 20,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.5198777032145709
+        }
+      },
+      "tuning_seconds": 0.23941387492232025,
+      "train": 1182,
+      "validation": 147,
+      "test": 147,
+      "background": 41364,
+      "test_candidates": 41511,
+      "cold_drugs": 10,
+      "cold_proteins": 1,
+      "test_pairs_with_cold_drug": 11,
+      "test_pairs_with_cold_protein": 1,
+      "data": {
+        "dataset": "ic",
+        "drugs": 210,
+        "proteins": 204,
+        "edges": 1476,
+        "density": 0.034453781512605045,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.164871,
+            "nonunit_diagonal": 5
+          },
+          "protein": {
+            "minimum": 0.00231565935342984,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "ic_simmat_dc.txt": "c1078ca88528d75ddb43d4ed2559391d7d8f5375ec572e6e9112e519d9cdbbf9",
+          "ic_simmat_dg.txt": "e15626145623124ad42a45412c544d5fed5e079003727df784d29ed3ca72efef",
+          "ic_admat_dgc.txt": "ac9df3498bc12af5174503e5f1e09ce26a6d78d753861a5eca55425f9f9ae2c9",
+          "bind_orfhsa_drug_ic.txt": "31166929b5b0837acc1f2553061365731192fc39c1e2916ea8d84874fac96bf4"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "ic",
+      "seed": 4,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.31788356862516914
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 20,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.4350003303943543
+        }
+      },
+      "tuning_seconds": 0.2375764170428738,
+      "train": 1182,
+      "validation": 147,
+      "test": 147,
+      "background": 41364,
+      "test_candidates": 41511,
+      "cold_drugs": 11,
+      "cold_proteins": 2,
+      "test_pairs_with_cold_drug": 11,
+      "test_pairs_with_cold_protein": 4,
+      "data": {
+        "dataset": "ic",
+        "drugs": 210,
+        "proteins": 204,
+        "edges": 1476,
+        "density": 0.034453781512605045,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.164871,
+            "nonunit_diagonal": 5
+          },
+          "protein": {
+            "minimum": 0.00231565935342984,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "ic_simmat_dc.txt": "c1078ca88528d75ddb43d4ed2559391d7d8f5375ec572e6e9112e519d9cdbbf9",
+          "ic_simmat_dg.txt": "e15626145623124ad42a45412c544d5fed5e079003727df784d29ed3ca72efef",
+          "ic_admat_dgc.txt": "ac9df3498bc12af5174503e5f1e09ce26a6d78d753861a5eca55425f9f9ae2c9",
+          "bind_orfhsa_drug_ic.txt": "31166929b5b0837acc1f2553061365731192fc39c1e2916ea8d84874fac96bf4"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "gpcr",
+      "seed": 0,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.12125877203313276
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 20,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.23982200773402743
+        }
+      },
+      "tuning_seconds": 0.15281320794019848,
+      "train": 509,
+      "validation": 63,
+      "test": 63,
+      "background": 20550,
+      "test_candidates": 20613,
+      "cold_drugs": 14,
+      "cold_proteins": 4,
+      "test_pairs_with_cold_drug": 16,
+      "test_pairs_with_cold_protein": 4,
+      "data": {
+        "dataset": "gpcr",
+        "drugs": 223,
+        "proteins": 95,
+        "edges": 635,
+        "density": 0.029974038234599952,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.18518500000000004,
+            "nonunit_diagonal": 7
+          },
+          "protein": {
+            "minimum": 0.00892998678417585,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "gpcr_simmat_dc.txt": "ba9c1cf096f0f688d1341fec22ebdecb63162005394d3b5ec3e2f2ef3fd40df9",
+          "gpcr_simmat_dg.txt": "c58c4311d2086a6914208ed0914598528ce54ade88eb52b0f737eedcaf5001e4",
+          "gpcr_admat_dgc.txt": "49b2a8a0139dac3116399618bfefc9d1afcc276ce31b7de4e241d1b6e62ef8ab",
+          "bind_orfhsa_drug_gpcr.txt": "b2e8eab957d9fd82bcfe1df8cbbcdf743c3a8805138de450bea482962aca80fa"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "gpcr",
+      "seed": 1,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.75,
+          "validation_ap": 0.13717965326967724
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.2734782413652022
+        }
+      },
+      "tuning_seconds": 0.15562804194632918,
+      "train": 509,
+      "validation": 63,
+      "test": 63,
+      "background": 20550,
+      "test_candidates": 20613,
+      "cold_drugs": 8,
+      "cold_proteins": 4,
+      "test_pairs_with_cold_drug": 9,
+      "test_pairs_with_cold_protein": 4,
+      "data": {
+        "dataset": "gpcr",
+        "drugs": 223,
+        "proteins": 95,
+        "edges": 635,
+        "density": 0.029974038234599952,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.18518500000000004,
+            "nonunit_diagonal": 7
+          },
+          "protein": {
+            "minimum": 0.00892998678417585,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "gpcr_simmat_dc.txt": "ba9c1cf096f0f688d1341fec22ebdecb63162005394d3b5ec3e2f2ef3fd40df9",
+          "gpcr_simmat_dg.txt": "c58c4311d2086a6914208ed0914598528ce54ade88eb52b0f737eedcaf5001e4",
+          "gpcr_admat_dgc.txt": "49b2a8a0139dac3116399618bfefc9d1afcc276ce31b7de4e241d1b6e62ef8ab",
+          "bind_orfhsa_drug_gpcr.txt": "b2e8eab957d9fd82bcfe1df8cbbcdf743c3a8805138de450bea482962aca80fa"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "gpcr",
+      "seed": 2,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.12988151185158092
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 2.0,
+          "alpha": 0.25,
+          "validation_ap": 0.3295911303533472
+        }
+      },
+      "tuning_seconds": 0.15419308294076473,
+      "train": 509,
+      "validation": 63,
+      "test": 63,
+      "background": 20550,
+      "test_candidates": 20613,
+      "cold_drugs": 12,
+      "cold_proteins": 1,
+      "test_pairs_with_cold_drug": 12,
+      "test_pairs_with_cold_protein": 1,
+      "data": {
+        "dataset": "gpcr",
+        "drugs": 223,
+        "proteins": 95,
+        "edges": 635,
+        "density": 0.029974038234599952,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.18518500000000004,
+            "nonunit_diagonal": 7
+          },
+          "protein": {
+            "minimum": 0.00892998678417585,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "gpcr_simmat_dc.txt": "ba9c1cf096f0f688d1341fec22ebdecb63162005394d3b5ec3e2f2ef3fd40df9",
+          "gpcr_simmat_dg.txt": "c58c4311d2086a6914208ed0914598528ce54ade88eb52b0f737eedcaf5001e4",
+          "gpcr_admat_dgc.txt": "49b2a8a0139dac3116399618bfefc9d1afcc276ce31b7de4e241d1b6e62ef8ab",
+          "bind_orfhsa_drug_gpcr.txt": "b2e8eab957d9fd82bcfe1df8cbbcdf743c3a8805138de450bea482962aca80fa"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "gpcr",
+      "seed": 3,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.75,
+          "validation_ap": 0.17649021960739839
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.3103649600376151
+        }
+      },
+      "tuning_seconds": 0.15059795894194394,
+      "train": 509,
+      "validation": 63,
+      "test": 63,
+      "background": 20550,
+      "test_candidates": 20613,
+      "cold_drugs": 13,
+      "cold_proteins": 0,
+      "test_pairs_with_cold_drug": 13,
+      "test_pairs_with_cold_protein": 0,
+      "data": {
+        "dataset": "gpcr",
+        "drugs": 223,
+        "proteins": 95,
+        "edges": 635,
+        "density": 0.029974038234599952,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.18518500000000004,
+            "nonunit_diagonal": 7
+          },
+          "protein": {
+            "minimum": 0.00892998678417585,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "gpcr_simmat_dc.txt": "ba9c1cf096f0f688d1341fec22ebdecb63162005394d3b5ec3e2f2ef3fd40df9",
+          "gpcr_simmat_dg.txt": "c58c4311d2086a6914208ed0914598528ce54ade88eb52b0f737eedcaf5001e4",
+          "gpcr_admat_dgc.txt": "49b2a8a0139dac3116399618bfefc9d1afcc276ce31b7de4e241d1b6e62ef8ab",
+          "bind_orfhsa_drug_gpcr.txt": "b2e8eab957d9fd82bcfe1df8cbbcdf743c3a8805138de450bea482962aca80fa"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "gpcr",
+      "seed": 4,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.09053179418005806
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 5,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.21447718751134592
+        }
+      },
+      "tuning_seconds": 0.14955374994315207,
+      "train": 509,
+      "validation": 63,
+      "test": 63,
+      "background": 20550,
+      "test_candidates": 20613,
+      "cold_drugs": 11,
+      "cold_proteins": 5,
+      "test_pairs_with_cold_drug": 11,
+      "test_pairs_with_cold_protein": 5,
+      "data": {
+        "dataset": "gpcr",
+        "drugs": 223,
+        "proteins": 95,
+        "edges": 635,
+        "density": 0.029974038234599952,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "max_asymmetry": 0.18518500000000004,
+            "nonunit_diagonal": 7
+          },
+          "protein": {
+            "minimum": 0.00892998678417585,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "gpcr_simmat_dc.txt": "ba9c1cf096f0f688d1341fec22ebdecb63162005394d3b5ec3e2f2ef3fd40df9",
+          "gpcr_simmat_dg.txt": "c58c4311d2086a6914208ed0914598528ce54ade88eb52b0f737eedcaf5001e4",
+          "gpcr_admat_dgc.txt": "49b2a8a0139dac3116399618bfefc9d1afcc276ce31b7de4e241d1b6e62ef8ab",
+          "bind_orfhsa_drug_gpcr.txt": "b2e8eab957d9fd82bcfe1df8cbbcdf743c3a8805138de450bea482962aca80fa"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "nr",
+      "seed": 0,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.25,
+          "validation_ap": 0.1496839829235717
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 10,
+          "power": 2.0,
+          "alpha": 0.5,
+          "validation_ap": 0.27385288326251106
+        }
+      },
+      "tuning_seconds": 0.013063583988696337,
+      "train": 72,
+      "validation": 9,
+      "test": 9,
+      "background": 1314,
+      "test_candidates": 1323,
+      "cold_drugs": 3,
+      "cold_proteins": 2,
+      "test_pairs_with_cold_drug": 3,
+      "test_pairs_with_cold_protein": 2,
+      "data": {
+        "dataset": "nr",
+        "drugs": 54,
+        "proteins": 26,
+        "edges": 90,
+        "density": 0.0641025641025641,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.013158,
+            "maximum": 1.0,
+            "max_asymmetry": 0.07500000000000001,
+            "nonunit_diagonal": 0
+          },
+          "protein": {
+            "minimum": 0.0179332965382288,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "nr_simmat_dc.txt": "f80e101f284934b85c5dc7601ecaca2cc86c62a946141b2587f3ac8482c9a7c1",
+          "nr_simmat_dg.txt": "5bf651f310b037320fe5d8aa61dfa15e0d8af4b0fd50c3969201085e64b631e1",
+          "nr_admat_dgc.txt": "74256ec88b415dbdb93735e93797955e82587f3154988e99787a4e604111963b",
+          "bind_orfhsa_drug_nr.txt": "22780b068eb828fe17f447a8ebb71b5ab3c3d0ef3f115163e584575e926d99df"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "nr",
+      "seed": 1,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.25,
+          "validation_ap": 0.16243157321817012
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 5,
+          "power": 1.0,
+          "alpha": 0.25,
+          "validation_ap": 0.3691040609601853
+        }
+      },
+      "tuning_seconds": 0.012728958972729743,
+      "train": 72,
+      "validation": 9,
+      "test": 9,
+      "background": 1314,
+      "test_candidates": 1323,
+      "cold_drugs": 4,
+      "cold_proteins": 2,
+      "test_pairs_with_cold_drug": 4,
+      "test_pairs_with_cold_protein": 2,
+      "data": {
+        "dataset": "nr",
+        "drugs": 54,
+        "proteins": 26,
+        "edges": 90,
+        "density": 0.0641025641025641,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.013158,
+            "maximum": 1.0,
+            "max_asymmetry": 0.07500000000000001,
+            "nonunit_diagonal": 0
+          },
+          "protein": {
+            "minimum": 0.0179332965382288,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "nr_simmat_dc.txt": "f80e101f284934b85c5dc7601ecaca2cc86c62a946141b2587f3ac8482c9a7c1",
+          "nr_simmat_dg.txt": "5bf651f310b037320fe5d8aa61dfa15e0d8af4b0fd50c3969201085e64b631e1",
+          "nr_admat_dgc.txt": "74256ec88b415dbdb93735e93797955e82587f3154988e99787a4e604111963b",
+          "bind_orfhsa_drug_nr.txt": "22780b068eb828fe17f447a8ebb71b5ab3c3d0ef3f115163e584575e926d99df"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "nr",
+      "seed": 2,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.25,
+          "validation_ap": 0.15132343180358565
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 5,
+          "power": 1.0,
+          "alpha": 0.25,
+          "validation_ap": 0.29611758264113935
+        }
+      },
+      "tuning_seconds": 0.012646709103137255,
+      "train": 72,
+      "validation": 9,
+      "test": 9,
+      "background": 1314,
+      "test_candidates": 1323,
+      "cold_drugs": 5,
+      "cold_proteins": 2,
+      "test_pairs_with_cold_drug": 5,
+      "test_pairs_with_cold_protein": 2,
+      "data": {
+        "dataset": "nr",
+        "drugs": 54,
+        "proteins": 26,
+        "edges": 90,
+        "density": 0.0641025641025641,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.013158,
+            "maximum": 1.0,
+            "max_asymmetry": 0.07500000000000001,
+            "nonunit_diagonal": 0
+          },
+          "protein": {
+            "minimum": 0.0179332965382288,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "nr_simmat_dc.txt": "f80e101f284934b85c5dc7601ecaca2cc86c62a946141b2587f3ac8482c9a7c1",
+          "nr_simmat_dg.txt": "5bf651f310b037320fe5d8aa61dfa15e0d8af4b0fd50c3969201085e64b631e1",
+          "nr_admat_dgc.txt": "74256ec88b415dbdb93735e93797955e82587f3154988e99787a4e604111963b",
+          "bind_orfhsa_drug_nr.txt": "22780b068eb828fe17f447a8ebb71b5ab3c3d0ef3f115163e584575e926d99df"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "nr",
+      "seed": 3,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.25,
+          "validation_ap": 0.15181415843433937
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 5,
+          "power": 1.0,
+          "alpha": 0.25,
+          "validation_ap": 0.28012204211348257
+        }
+      },
+      "tuning_seconds": 0.012491834000684321,
+      "train": 72,
+      "validation": 9,
+      "test": 9,
+      "background": 1314,
+      "test_candidates": 1323,
+      "cold_drugs": 6,
+      "cold_proteins": 0,
+      "test_pairs_with_cold_drug": 6,
+      "test_pairs_with_cold_protein": 0,
+      "data": {
+        "dataset": "nr",
+        "drugs": 54,
+        "proteins": 26,
+        "edges": 90,
+        "density": 0.0641025641025641,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.013158,
+            "maximum": 1.0,
+            "max_asymmetry": 0.07500000000000001,
+            "nonunit_diagonal": 0
+          },
+          "protein": {
+            "minimum": 0.0179332965382288,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "nr_simmat_dc.txt": "f80e101f284934b85c5dc7601ecaca2cc86c62a946141b2587f3ac8482c9a7c1",
+          "nr_simmat_dg.txt": "5bf651f310b037320fe5d8aa61dfa15e0d8af4b0fd50c3969201085e64b631e1",
+          "nr_admat_dgc.txt": "74256ec88b415dbdb93735e93797955e82587f3154988e99787a4e604111963b",
+          "bind_orfhsa_drug_nr.txt": "22780b068eb828fe17f447a8ebb71b5ab3c3d0ef3f115163e584575e926d99df"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    },
+    {
+      "dataset": "nr",
+      "seed": 4,
+      "selected": {
+        "two-sided": {
+          "method": "two-sided",
+          "k": "",
+          "power": 1.0,
+          "alpha": 0.75,
+          "validation_ap": 0.1605457202219113
+        },
+        "two-sided-topk": {
+          "method": "two-sided-topk",
+          "k": 5,
+          "power": 1.0,
+          "alpha": 0.5,
+          "validation_ap": 0.34564436163428963
+        }
+      },
+      "tuning_seconds": 0.012819333001971245,
+      "train": 72,
+      "validation": 9,
+      "test": 9,
+      "background": 1314,
+      "test_candidates": 1323,
+      "cold_drugs": 3,
+      "cold_proteins": 1,
+      "test_pairs_with_cold_drug": 3,
+      "test_pairs_with_cold_protein": 1,
+      "data": {
+        "dataset": "nr",
+        "drugs": 54,
+        "proteins": 26,
+        "edges": 90,
+        "density": 0.0641025641025641,
+        "source_orientation": "protein_rows; transposed",
+        "similarities": {
+          "drug": {
+            "minimum": 0.013158,
+            "maximum": 1.0,
+            "max_asymmetry": 0.07500000000000001,
+            "nonunit_diagonal": 0
+          },
+          "protein": {
+            "minimum": 0.0179332965382288,
+            "maximum": 1.0,
+            "max_asymmetry": 0.0,
+            "nonunit_diagonal": 0
+          }
+        },
+        "input_sha256": {
+          "nr_simmat_dc.txt": "f80e101f284934b85c5dc7601ecaca2cc86c62a946141b2587f3ac8482c9a7c1",
+          "nr_simmat_dg.txt": "5bf651f310b037320fe5d8aa61dfa15e0d8af4b0fd50c3969201085e64b631e1",
+          "nr_admat_dgc.txt": "74256ec88b415dbdb93735e93797955e82587f3154988e99787a4e604111963b",
+          "bind_orfhsa_drug_nr.txt": "22780b068eb828fe17f447a8ebb71b5ab3c3d0ef3f115163e584575e926d99df"
+        },
+        "similarity_transform": "average with transpose; zero diagonal",
+        "edge_list_crosscheck": "passed"
+      }
+    }
+  ],
+  "git": {
+    "commit": "edccfa2e00769d58615049bc4b7c01a9412ca80d",
+    "branch": "refactor/simple-three-folders-20261128",
+    "dirty": false
+  },
+  "source_sha256": "6cfc5155c8cec62fee912211612c486acc64ac6c3011587b2a2d3d5bf1c70c22",
+  "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+  "numpy": "2.5.5",
+  "matplotlib": "3.11.2",
+  "platform": "macOS-27.2.1-arm64-arm-64bit",
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": null,
+    "MKL_NUM_THREADS": null
+  },
+  "finished_utc": "2026-11-28T08:10:39.182288+00:00",
+  "prediction_settings_seed": 0,
+  "note": "Zeros are unlabeled; test measures random hidden-edge recovery. Predictions use all recorded positives.",
+  "path_base": "project_root",
+  "path_normalized_after_run": true
+}

@@ -1,0 +1,31 @@
+test_alignment_uses_both_identifier_axes (__main__.DataChecks.test_alignment_uses_both_identifier_axes) ... ok
+test_candidates_exclude_other_positives (__main__.DataChecks.test_candidates_exclude_other_positives) ... ok
+test_custom_data_transpose_and_hashes (__main__.DataChecks.test_custom_data_transpose_and_hashes) ... ok
+test_reader_rejects_bad_files (__main__.DataChecks.test_reader_rejects_bad_files) ... ok
+test_split_preserves_known_edges (__main__.DataChecks.test_split_preserves_known_edges) ... ok
+test_hand_rankings_and_ties (__main__.MetricChecks.test_hand_rankings_and_ties) ... ok
+test_invalid_metrics_inputs (__main__.MetricChecks.test_invalid_metrics_inputs) ... ok
+test_precision_denominator_and_macro_population (__main__.MetricChecks.test_precision_denominator_and_macro_population) ... ok
+test_top_ties_use_ids_not_labels (__main__.MetricChecks.test_top_ties_use_ids_not_labels) ... ok
+test_undefined_metrics_remain_none (__main__.MetricChecks.test_undefined_metrics_remain_none) ... ok
+test_baseline_and_active_neighbour_denominators (__main__.ModelChecks.test_baseline_and_active_neighbour_denominators) ... ok
+test_fusion_availability_and_endpoints (__main__.ModelChecks.test_fusion_availability_and_endpoints) ... ok
+test_loop_and_numpy_scores_agree (__main__.ModelChecks.test_loop_and_numpy_scores_agree) ... ok
+test_power_and_identifier_ties (__main__.ModelChecks.test_power_and_identifier_ties) ... ok
+test_three_step_paths_and_controls (__main__.ModelChecks.test_three_step_paths_and_controls) ... ok
+test_zero_support_and_invalid_settings (__main__.ModelChecks.test_zero_support_and_invalid_settings) ... ok
+test_blank_metrics_stay_undefined (__main__.PlotChecks.test_blank_metrics_stay_undefined) ... ok
+test_cutoff_and_time_validation (__main__.PlotChecks.test_cutoff_and_time_validation) ... ok
+test_invalid_numeric_values (__main__.PlotChecks.test_invalid_numeric_values) ... ok
+test_missing_columns_duplicates_and_method_mismatch (__main__.PlotChecks.test_missing_columns_duplicates_and_method_mismatch) ... ok
+test_complete_run_and_predictions (__main__.RunChecks.test_complete_run_and_predictions) ... ok
+test_sample_sd_and_defined_metric_counts (__main__.RunChecks.test_sample_sd_and_defined_metric_counts) ... ok
+test_ablation_endpoints_preserve_existing_methods (__main__.StudyChecks.test_ablation_endpoints_preserve_existing_methods) ... ok
+test_complete_optional_study_is_separate_and_reproducible (__main__.StudyChecks.test_complete_optional_study_is_separate_and_reproducible) ... ok
+test_incremental_stage_scores_by_hand (__main__.StudyChecks.test_incremental_stage_scores_by_hand) ... ok
+test_validation_ties_follow_predeclared_grid (__main__.StudyChecks.test_validation_ties_follow_predeclared_grid) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 0.078s
+
+OK
