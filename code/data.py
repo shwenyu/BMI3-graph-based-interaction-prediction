@@ -1,14 +1,33 @@
 """Read the labelled matrices, then hide known edges for validation and testing."""
 from dataclasses import dataclass
 import hashlib
+import os
 from pathlib import Path
 import re
 
 import numpy as np
 
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def project_path(value):
+    """Relative paths always start at the folder containing input/code/output."""
+    path = Path(value).expanduser()
+    return (path if path.is_absolute() else ROOT / path).resolve()
+
+
+def recorded_path(value):
+    """Keep saved settings portable; explicit external Windows drives are an exception."""
+    path = project_path(value)
+    try:
+        return Path(os.path.relpath(path, ROOT)).as_posix()
+    except ValueError:
+        return path.as_posix()
+
 
 def read_matrix(path):
-    lines = [line.split() for line in Path(path).read_text(encoding="utf-8-sig").splitlines()
+    path = project_path(path)
+    lines = [line.split() for line in path.read_text(encoding="utf-8-sig").splitlines()
              if line.strip()]
     if len(lines) < 2:
         raise ValueError(f"Expected a header and matrix rows: {path}")
@@ -52,7 +71,7 @@ class Dataset:
 def load_dataset(root, code):
     if not isinstance(code, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", code):
         raise ValueError("Use a dataset prefix containing letters, digits, '_' or '-'")
-    root = Path(root)
+    root = project_path(root)
     dr, dc, sd = read_matrix(root / f"{code}_simmat_dc.txt")
     pr, pc, sp = read_matrix(root / f"{code}_simmat_dg.txt")
     rows, columns, graph = read_matrix(root / f"{code}_admat_dgc.txt")

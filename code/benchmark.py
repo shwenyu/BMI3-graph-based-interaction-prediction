@@ -13,11 +13,10 @@ from pathlib import Path
 from time import perf_counter
 
 import numpy as np
-from data import load_dataset, split_edges, candidate_masks
+from data import ROOT, project_path, recorded_path, load_dataset, split_edges, candidate_masks
 from models import (drug_only, protein_only, two_sided, neighbour_scores,
                     fuse_scores, dti_only, target_degree, random_scores)
 
-ROOT = Path(__file__).resolve().parent.parent
 METHODS = ("random", "target-degree", "dti-only", "drug-only", "protein-only",
            "two-sided", "two-sided-topk")
 METRICS = ("ap", "auroc", "macro_top_precision", "macro_top_recall", "score_seconds")
@@ -158,7 +157,7 @@ def aggregate(rows):
 
 
 def save_csv(path, rows, fields=None):
-    with Path(path).open("w", newline="", encoding="utf-8") as handle:
+    with project_path(path).open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields or list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
@@ -304,11 +303,11 @@ def run_study(args):
         save_csv(args.output / "parameter_frequency.csv", [dict(method=m, alpha=a, k=k, power=p, count=n)
                  for (m, a, k, p), n in frequencies.items()])
     digest = hashlib.sha256()
-    for path in sorted(Path(__file__).parent.glob("*.py")):
+    for path in sorted((ROOT / "code").glob("*.py")):
         digest.update(path.name.encode())
         digest.update(path.read_bytes())
-    config = {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()}
-    receipt = dict(config=config, runs=records, git=git_state(), source_sha256=digest.hexdigest(),
+    config = {k: recorded_path(v) if isinstance(v, Path) else v for k, v in vars(args).items()}
+    receipt = dict(config=config, path_base="project_root", runs=records, git=git_state(), source_sha256=digest.hexdigest(),
         python=sys.version, numpy=np.__version__, matplotlib=version("matplotlib") if not args.no_plots else None,
         thread_environment={n: os.environ.get(n) for n in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS")},
         finished_utc=datetime.now(timezone.utc).isoformat(), effective_ablation_powers=list(dict.fromkeys([1., *args.powers])),
@@ -324,7 +323,7 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", nargs="+", default=["e", "ic", "gpcr", "nr"])
     parser.add_argument("--seed", nargs="+", type=int, default=[0, 1, 2, 3, 4])
-    parser.add_argument("--input", type=Path, default=ROOT / "input")
+    parser.add_argument("--input", type=Path, default=Path("input"))
     parser.add_argument("--output", type=Path)
     parser.add_argument("--study", action="store_true", help="Run additional checks without changing the main benchmark")
     parser.add_argument("--stability-seeds", type=int, default=20, help="Number of NR repeat splits in --study mode")
@@ -340,7 +339,8 @@ def parse_args(argv=None):
     parser.add_argument("--no-predictions", action="store_true")
     args = parser.parse_args(argv)
     if args.output is None:
-        args.output = ROOT / "output" / "validation" if args.study else ROOT / "output"
+        args.output = Path("output/validation") if args.study else Path("output")
+    args.input, args.output = project_path(args.input), project_path(args.output)
     if args.study and args.stability_seeds < 2:
         parser.error("stability-seeds must be at least two")
     if any(not np.isfinite(a) or not 0 <= a <= 1 for a in args.alphas):
@@ -421,12 +421,12 @@ def main(argv=None):
     if not args.no_predictions:
         save_csv(args.output / "predictions.csv", predictions,
                  ["dataset", "seed", "drug", "protein", "rank", "score", "status"])
-    config = {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()}
+    config = {key: recorded_path(value) if isinstance(value, Path) else value for key, value in vars(args).items()}
     digest = hashlib.sha256()
-    for path in sorted(Path(__file__).parent.glob("*.py")):
+    for path in sorted((ROOT / "code").glob("*.py")):
         digest.update(path.name.encode())
         digest.update(path.read_bytes())
-    receipt = dict(config=config, runs=records, git=git_state(), source_sha256=digest.hexdigest(),
+    receipt = dict(config=config, path_base="project_root", runs=records, git=git_state(), source_sha256=digest.hexdigest(),
         python=sys.version, numpy=np.__version__,
         matplotlib=version("matplotlib") if not args.no_plots else None, platform=platform.platform(),
         thread_environment={name: os.environ.get(name) for name in ("OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "MKL_NUM_THREADS")},

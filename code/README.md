@@ -31,6 +31,18 @@ python code/benchmark.py
 本地仓库已保留隐藏的 `.venv` 环境，可以用 `.venv/bin/python` 代替 `python`。
 `.git` 保存版本历史；它们是隐藏的基础文件夹，不属于三个工作文件夹。
 
+路径统一相对于包含 `input`、`code`、`output` 的项目根目录，和启动命令时所在位置无关。
+默认读取 `input`、写入 `output`，验证模式默认写入 `output/validation`。例如
+`--input input --output output/nr-demo` 在根目录或 code 目录启动都指向同一位置。
+也可以进入 code 目录运行 `python benchmark.py`，或从其他位置启动这个脚本。
+程序根据脚本位置寻找项目根目录，没有写死个人电脑的目录。
+
+新生成的 JSON 设置使用 `input`、`output/nr-demo` 这样的相对路径，并标注
+`path_base: project_root`。显式指定项目外部的绝对路径仍受支持，但外部数据也要随迁移
+重新提供；Windows 跨盘符路径无法表示为相对路径时，会保留该显式外部路径。
+已有实验 JSON 只转换了路径的表示方式，原来的指标、运行提交、时间和源码哈希保留。
+换电脑时复制这三个工作目录并安装 NumPy、Matplotlib 即可；本机 `.venv` 应重新创建。
+
 默认运行四个数据集、种子 0–4、七种方法，并自动生成图和未标注候选预测。
 已有结果不会被覆盖。复跑时请使用一个新的输出位置，例如：
 

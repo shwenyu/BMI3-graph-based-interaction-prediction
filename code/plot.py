@@ -4,6 +4,7 @@ import csv
 from pathlib import Path
 
 import numpy as np
+from data import project_path
 
 METHODS = {
     "random": "Random", "target-degree": "Target degree", "dti-only": "DTI paths",
@@ -33,7 +34,7 @@ def read_results(results):
     required = {"dataset", "method", "runs", "top_n"}
     required.update(f"{metric}_{stat}" for metric in METRICS for stat in ("mean", "sd"))
     tables, cutoffs = {}, set()
-    with (Path(results) / "summary.csv").open(newline="") as handle:
+    with (project_path(results) / "summary.csv").open(newline="") as handle:
         reader = csv.DictReader(handle)
         if not required.issubset(reader.fieldnames or []):
             raise ValueError("summary.csv is missing required columns")
@@ -79,7 +80,7 @@ def plot_results(tables, output):
     matplotlib.use("Agg")
     from matplotlib import pyplot as plt
 
-    output = Path(output)
+    output = project_path(output)
     output.mkdir(parents=True, exist_ok=True)
     first = next(iter(tables.values()))
     methods = [method for method in METHODS if method in first]
@@ -115,7 +116,7 @@ def plot_study(output):
     from matplotlib import pyplot as plt
     from matplotlib.ticker import PercentFormatter
 
-    output = Path(output)
+    output = project_path(output)
     def read(name):
         with (output / f"{name}.csv").open(newline="") as handle:
             return list(csv.DictReader(handle))
@@ -214,7 +215,8 @@ def plot_study(output):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=Path(__file__).resolve().parent.parent / "output")
+    parser.add_argument("--output", type=Path, default=Path("output"))
     args = parser.parse_args()
-    plot_results(read_results(args.output), args.output)
-    print(f"Saved benchmark and runtime figures to {args.output}")
+    output = project_path(args.output)
+    plot_results(read_results(output), output)
+    print(f"Saved benchmark and runtime figures to {output}")

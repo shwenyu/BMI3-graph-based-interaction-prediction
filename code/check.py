@@ -3,16 +3,23 @@ import contextlib
 import csv
 import io
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import numpy as np
+import data as data_module
 from data import Dataset, align_square, candidate_masks, load_dataset, read_matrix, split_edges
+from data import project_path, recorded_path
 from models import (drug_only, protein_only, neighbour_scores, two_sided,
                     fuse_scores, dti_only, target_degree, random_scores)
 from benchmark import (ablation_scores, aggregate, evaluate, main, ranking_metrics,
-                       topk_scores, tune_ablation)
+                       parse_args, save_csv, topk_scores, tune_ablation)
 from plot import METRICS, read_results
 
 
@@ -402,6 +409,110 @@ class StudyChecks(unittest.TestCase):
             self.assertEqual(receipt["config"]["stability_seeds"], 2)
             with self.assertRaises(ValueError):
                 main(args)
+
+
+class PathChecks(unittest.TestCase):
+    def write_tiny_data(self, folder):
+        folder.mkdir(parents=True, exist_ok=True)
+        drugs, proteins = tuple(f"d{i}" for i in range(5)), tuple(f"p{i}" for i in range(5))
+        graph = np.eye(5, dtype=int) + np.roll(np.eye(5, dtype=int), 1, axis=1)
+        for suffix, rows, columns, matrix in (
+            ("admat_dgc", drugs, proteins, graph),
+            ("simmat_dc", drugs, drugs, np.ones((5, 5))),
+            ("simmat_dg", proteins, proteins, np.ones((5, 5)))):
+            lines = ["\t".join(columns)]
+            lines.extend("\t".join([name, *map(str, values)]) for name, values in zip(rows, matrix))
+            (folder / f"tiny_{suffix}.txt").write_text("\n".join(lines) + "\n")
+        return graph
+
+    def test_cli_paths_follow_project_not_working_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve() / "project"
+            unrelated = root.parent / "unrelated"
+            root.mkdir()
+            unrelated.mkdir()
+            previous = Path.cwd()
+            try:
+                os.chdir(unrelated)
+                with mock.patch.object(data_module, "ROOT", root):
+                    normal = parse_args([])
+                    study = parse_args(["--study"])
+                    custom = parse_args(["--input", "input", "--output", "output/new run"])
+                    outside = root.parent / "external data"
+                    absolute = parse_args(["--input", str(outside)])
+                    self.assertEqual(normal.input, root / "input")
+                    self.assertEqual(normal.output, root / "output")
+                    self.assertEqual(study.output, root / "output/validation")
+                    self.assertEqual(custom.output, root / "output/new run")
+                    self.assertEqual(absolute.input, outside)
+                    self.assertEqual(project_path("input"), root / "input")
+            finally:
+                os.chdir(previous)
+
+    def test_recorded_paths_are_project_relative(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve() / "project"
+            with mock.patch.object(data_module, "ROOT", root):
+                self.assertEqual(recorded_path(root / "input"), "input")
+                self.assertEqual(recorded_path("output/validation"), "output/validation")
+                self.assertEqual(recorded_path(root.parent / "shared"), "../shared")
+                self.assertFalse(Path(recorded_path(root / "input")).is_absolute())
+
+    def test_relative_file_operations_use_project_folder(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve() / "project"
+            expected = self.write_tiny_data(root / "input")
+            (root / "output").mkdir()
+            unrelated = root.parent / "unrelated"
+            unrelated.mkdir()
+            previous = Path.cwd()
+            try:
+                os.chdir(unrelated)
+                with mock.patch.object(data_module, "ROOT", root):
+                    rows, columns, matrix = read_matrix("input/tiny_admat_dgc.txt")
+                    self.assertEqual((rows[0], columns[0]), ("d0", "p0"))
+                    np.testing.assert_array_equal(matrix, expected)
+                    np.testing.assert_array_equal(load_dataset("input", "tiny").interactions, expected)
+                    save_csv("output/example.csv", [dict(value=5)])
+                    summary = dict(dataset="tiny", method="random", runs=1, top_n=10)
+                    for metric in METRICS:
+                        summary[metric + "_mean"], summary[metric + "_sd"] = .25, ""
+                    save_csv("output/summary.csv", [summary])
+                    self.assertEqual(read_results("output")["tiny"]["random"]["ap_mean"], .25)
+                self.assertTrue((root / "output/example.csv").is_file())
+                self.assertFalse((unrelated / "output").exists())
+            finally:
+                os.chdir(previous)
+
+    def test_copied_project_runs_from_an_unrelated_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve() / "copied project"
+            code = root / "code"
+            code.mkdir(parents=True)
+            for source in Path(__file__).resolve().parent.glob("*.py"):
+                shutil.copy2(source, code / source.name)
+            self.write_tiny_data(root / "input")
+            unrelated = root.parent / "unrelated working directory"
+            unrelated.mkdir()
+            command = [sys.executable, str(code / "benchmark.py"), "--dataset", "tiny", "--seed", "0",
+                       "--ks", "2", "--powers", "1", "--alphas", ".5", "--timing-repeats", "1", "--no-plots"]
+            environment = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+            for extra in ([], ["--study", "--stability-seeds", "2"]):
+                completed = subprocess.run(command + extra, cwd=unrelated, env=environment,
+                                           capture_output=True, text=True)
+                self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+            normal = json.loads((root / "output/experiment.json").read_text())
+            study = json.loads((root / "output/validation/study.json").read_text())
+            self.assertEqual((normal["config"]["input"], normal["config"]["output"]), ("input", "output"))
+            self.assertEqual((study["config"]["input"], study["config"]["output"]), ("input", "output/validation"))
+            self.assertEqual(normal["runs"][0]["test_candidates"], 16)
+            self.assertEqual({r["candidates"] for r in study["runs"]}, {16})
+            with (root / "output/metrics.csv").open() as handle:
+                metrics = list(csv.DictReader(handle))
+            self.assertEqual(len(metrics), 7)
+            self.assertTrue(all(np.isfinite(float(r["ap"])) for r in metrics))
+            self.assertTrue((root / "output/predictions.csv").is_file())
+            self.assertFalse((unrelated / "output").exists())
 
 
 if __name__ == "__main__":
